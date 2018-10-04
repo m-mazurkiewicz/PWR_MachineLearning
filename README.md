@@ -4,11 +4,12 @@
   https://gitlab.com/YOURUSERNAME/YOURREPO.git
 ```
 
-2. mkdir a directory and clone your repo there:
+2. mkdir a directory and clone your (empty) repo there:
 ```
 $ mkdir workdir
 $ cd workdir
 $ git clone https://gitlab.com/YOURUSERNAME/YOURREPO.git
+$ cd YOURREPO
 ```
 
 3. Add this repo as an upstream.
@@ -16,7 +17,7 @@ $ git clone https://gitlab.com/YOURUSERNAME/YOURREPO.git
 $ git remote add upstream https://gitlab.com/wmatbd/ml.git
 ```
 
-4. Update your repo to contain the changes from upstream:
+### Update your repo to contain the changes from upstream:
 ```
 $ git fetch upstream
 $ git checkout master
