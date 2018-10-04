@@ -1,4 +1,4 @@
-#First steps:
+### First steps:
 1. Create your repository, say,
 ```
   https://gitlab.com/YOURUSERNAME/YOURREPO.git
@@ -23,7 +23,7 @@ $ git checkout master
 $ git pull
 ```
 
-#Work on your repo:
+### Work on your repo:
 ```
 $ git add (files)
 $ git commit -m "Your commit message"
