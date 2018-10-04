@@ -11,10 +11,22 @@ $ cd workdir
 $ git clone https://gitlab.com/YOURUSERNAME/YOURREPO.git
 ```
 
-3. Add this repo as an upstream and fork to your repo:
+3. Add this repo as an upstream.
 ```
 $ git remote add upstream https://gitlab.com/wmatbd/ml.git
+```
+
+4. Update your repo to contain the changes from upstream:
+```
 $ git fetch upstream
 $ git checkout master
 $ git pull
 ```
+
+5. Work on your repo:
+```
+$ git add (files)
+$ git commit -m "Your commit message"
+$ git push origin master
+```
+
