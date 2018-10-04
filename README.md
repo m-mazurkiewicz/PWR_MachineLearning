@@ -30,4 +30,3 @@ $ git add (files)
 $ git commit -m "Your commit message"
 $ git push origin master
 ```
-
