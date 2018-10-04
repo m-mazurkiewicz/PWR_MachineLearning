@@ -30,3 +30,10 @@ $ git add (files)
 $ git commit -m "Your commit message"
 $ git push origin master
 ```
+
+### Changing access to your repo (on gitlab) to ssh:
+```
+$ git remote set-url origin git@gitlab.com:YOURUSERNAME/YOURREPO.git
+```
+Then after `ssh-keygen` and copying the public key to your gitlab account, you will be able to push/pull over ssh.
+
