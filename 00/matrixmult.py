@@ -8,13 +8,22 @@ import pytest
 import numpy as np
 
 def multiply(a, b):
-    # fix me!
-    pass
+    if len(a[0])!=len(b):
+        raise Exception("Wrong matrix multiplication")
+    result = []
+    for i in range(len(a)):
+        mid_result = []
+        for j in range(len(b[0])):
+            single_field = 0
+            for k in range(len(b)):
+                single_field += a[i][k] * b[k][j]
+            mid_result.append(single_field)
+        result.append(mid_result)
+    return result
 
 
 def multiplyWithNumpy(a, b):
-    # fix me!
-    pass
+    return np.dot(a, b)
 
 
 testdata = [
