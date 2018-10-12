@@ -39,6 +39,5 @@ def sigmoid(x):
 
 
 if __name__ == '__main__':
-    # print((np.ones((10)) * 10).tolist() + [1])
     NN = NeuralNetwork(3,[10,20,20,2],sigmoid)
     print(NN.output((np.ones((9,1))*10)))
