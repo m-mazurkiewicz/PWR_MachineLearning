@@ -19,13 +19,16 @@ class NeuralNetwork:
             self.bias[i] = np.random.rand(layers_size_vector[i+1],1)*2-1
 
     def output(self,input_vector):
-        input_vector = [1] + input_vector
+        input_vector = np.vstack([1,input_vector])
+        # print(input_vector)
         if len(input_vector) != self.layers_size_vector[0]:
             raise Exception('Dimensions mismatch!')
         A = input_vector
         for i in range(self.number_of_layers):
+            # print(A)
+            # print(self.weights[1].shape, A.shape)
             A = self.activation_function(np.dot(self.weights[i], A) + self.bias[i])
-        return A
+        return A.flatten().tolist()
 
 
 def ReLU(x):
@@ -36,5 +39,6 @@ def sigmoid(x):
 
 
 if __name__ == '__main__':
-    NN = NeuralNetwork(3,[10,20,20,2],ReLU)
-    print(NN.output(np.ones((10,1))*10))
+    # print((np.ones((10)) * 10).tolist() + [1])
+    NN = NeuralNetwork(3,[10,20,20,2],sigmoid)
+    print(NN.output((np.ones((9,1))*10)))
