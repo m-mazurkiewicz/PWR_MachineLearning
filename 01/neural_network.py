@@ -1,5 +1,4 @@
 import numpy as np
-import math
 
 
 class NeuralNetwork:
@@ -28,12 +27,14 @@ class NeuralNetwork:
             A = self.activation_function(np.dot(self.weights[i], A) + self.bias[i])
         return A
 
+
 def ReLU(x):
     return x * (x > 0)
 
 def sigmoid(x):
     return 1 / (1 + np.exp(-x))
 
+
 if __name__ == '__main__':
-    NN = NeuralNetwork(3,[10,20,20,2],sigmoid)
-    print(NN.output(np.random.rand(10,1)*10))
+    NN = NeuralNetwork(3,[10,20,20,2],ReLU)
+    print(NN.output(np.ones((10,1))*10))
