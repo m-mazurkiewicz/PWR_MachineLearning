@@ -5,7 +5,7 @@ class NeuralNetwork:
 
     def __init__(self, number_of_layers, layers_size_vector, activation_function):
         if number_of_layers != len(layers_size_vector)-1:
-            raise Exception('Inconsistent input parameters!')
+            raise ValueError('Inconsistent input parameters!')
         self.activation_function = activation_function
         self.number_of_layers = number_of_layers
         self.initialise_parameters(layers_size_vector)
@@ -22,7 +22,7 @@ class NeuralNetwork:
         input_vector = np.vstack([1,input_vector])
         # print(input_vector)
         if len(input_vector) != self.layers_size_vector[0]:
-            raise Exception('Dimensions mismatch!')
+            raise ValueError('Dimensions mismatch!')
         A = input_vector
         for i in range(self.number_of_layers):
             # print(A)
