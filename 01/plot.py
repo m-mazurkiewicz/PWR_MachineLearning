@@ -61,7 +61,7 @@ viewX = [-4, 4, 101]
 viewY = [-4, 4, 101]
 
 # NN = NeuralNetwork(3, [3, 20, 20, 2], sigma)
-# plotDecisionDomain_our(getGrid(viewX), getGrid(viewY), getDecisionOfFakeNeuralNet_our, NN.output)
+# plotDecisionDomain_our(getGrid(viewX), getGrid(viewY), getDecisionOfFakeNeuralNet_our, NN.single_output)
 plotDecisionDomain(getGrid(viewX), getGrid(viewY), getDecisionOfFakeNeuralNet)
 plotSamples(samples)
 plt.show()
