@@ -31,6 +31,8 @@ class NeuralNetwork:
             A = self.activation_function(np.dot(self.weights[i], A) + self.bias[i])
         return A.flatten().tolist()
 
+    def fit(self, learning_rate, epsilon):
+
 
 
 
