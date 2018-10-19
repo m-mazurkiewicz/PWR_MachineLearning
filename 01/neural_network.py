@@ -3,13 +3,14 @@ import numpy as np
 
 class NeuralNetwork:
 
-    def __init__(self, number_of_layers, layers_size_vector, activation_function):
+    def __init__(self, number_of_layers, layers_size_vector, activation_function, cost_function):
         if number_of_layers != len(layers_size_vector)-1:
             raise ValueError('Inconsistent input parameters!')
         self.activation_function = activation_function
         self.number_of_layers = number_of_layers
         self.initialise_parameters(layers_size_vector)
         self.layers_size_vector = layers_size_vector
+        self.cost_function = cost_function
 
     def initialise_parameters(self, layers_size_vector):
         self.weights = dict()
@@ -29,6 +30,8 @@ class NeuralNetwork:
             # print(self.weights[1].shape, A.shape)
             A = self.activation_function(np.dot(self.weights[i], A) + self.bias[i])
         return A.flatten().tolist()
+
+
 
 
 def ReLU(x):
