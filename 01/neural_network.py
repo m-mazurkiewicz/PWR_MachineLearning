@@ -34,19 +34,23 @@ class NeuralNetwork:
     def whole_output(self, input_matrix):
         number_of_training_examples = input_matrix.shape[1]
         A = np.vstack([[1] * number_of_training_examples, input_matrix])
+        cache = []
         for i in range(self.number_of_layers):
-            A = self.activation_function(np.dot(self.weights[i], A))
-        return A
+            Z = self.linear_forward(A, i)
+            cache.append((A, Z))
+            A = self.activation_function(Z)
+        return A, cache
 
     def predict(self,input_matrix):
         return np.argmax(self.whole_output(input_matrix), axis=0)
 
     def cost_function(self, X, Y, _lambda = 0):
-        return np.sum(-np.multiply(Y, np.log(self.whole_output(X))) - np.multiply((1 - Y), np.log(1 - self.whole_output(X)))) / Y.shape[1]
+        output,_ = self.whole_output(X)
+        return np.sum(-np.multiply(Y, np.log(output)) - np.multiply((1 - Y), np.log(1 - output))) / Y.shape[1]
 
     def linear_forward(self, previous_A, layer_no):
         cache = np.dot(self.weights[layer_no], previous_A)
-        return self.activation_function(cache), cache
+        return cache
 
     def output_layer_cost_derivative(self, output_matrix, Y):
         return - (np.divide(Y, output_matrix) - np.divide(1 - Y, 1 - output_matrix))
@@ -79,4 +83,4 @@ if __name__ == '__main__':
     #print(NN.cost_function(np.random.rand(9, 3) * 10, b.T))
     #print(NN.output_layer_cost_derivative(NN.whole_output(np.random.rand(9, 3) * 10), b.T))
     #print(NN.new_whole_output(np.random.rand(9, 3) * 10))
-    print(NN.whole_output(np.random.rand(9, 3) * 10))
+    print(NN.whole_output(np.random.rand(9, 3) * 10)[1])
