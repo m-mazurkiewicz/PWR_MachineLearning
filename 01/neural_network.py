@@ -27,7 +27,8 @@ class NeuralNetwork:
         for i in range(self.number_of_layers):
             # print(A)
             # print(self.weights[1].shape, A.shape)
-            A = self.activation_function(np.dot(self.weights[i], A))# + self.bias[i])
+            #A = self.activation_function(np.dot(self.weights[i], A))# + self.bias[i])
+            A,_ = self.linear_forward(A, i)
         return A.flatten().tolist()
 
     def whole_output(self, input_matrix):
@@ -46,12 +47,22 @@ class NeuralNetwork:
         # self.cost_function
         pass
 
+    def linear_forward(self, previous_A, layer_no):
+        cache = np.dot(self.weights[layer_no], previous_A)
+        return self.activation_function(cache), cache
+
 
 def ReLU(x):
     return x * (x > 0)
 
+
 def sigmoid(x):
     return 1 / (1 + np.exp(-x))
+
+
+def sigmoid_derivative(x):
+    s = sigmoid(x)
+    return s * (1 - s)
 
 
 if __name__ == '__main__':
