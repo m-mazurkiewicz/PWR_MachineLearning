@@ -56,14 +56,13 @@ class NeuralNetwork:
         return np.dot(self.weights[layer_no], previous_A)
 
     def back_propagation(self, X, Y):
-        cost_derivatives = dict()
-        weight_derivatives = dict()
         output_matrix = self.whole_output(X)
-        cost_derivatives[self.number_of_layers-1] = self.output_layer_cost_derivative(output_matrix, Y)
+        self.cost_derivatives[self.number_of_layers - 1] = self.output_layer_cost_derivative(output_matrix, Y)
         for i in reversed(range(self.number_of_layers)):
-            dZ = cost_derivatives[i] * self.activation_function(self.cache[i][1], grad = True)
-            weight_derivatives[i] = np.dot(dZ, self.cache[i-1][0].T) / X.shape[1]
-            cost_derivatives[i-1] = np.dot(self.weights[i].T, dZ)
+            dZ = self.cost_derivatives[i] * self.activation_function(self.cache[i][1], grad = True)
+            self.weight_derivatives = dict()
+            self.weight_derivatives[i] = np.dot(dZ, self.cache[i - 1][0].T) / X.shape[1]
+            self.cost_derivatives[i - 1] = np.dot(self.weights[i].T, dZ)
 
 
     def fit(self, learning_rate, epsilon, max_iteration_number = 10000):
