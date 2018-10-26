@@ -18,24 +18,25 @@ class NeuralNetwork:
             self.weights[i] = np.random.rand(layers_size_vector[i+1],layers_size_vector[i])*2-1
          #   self.bias[i] = np.random.rand(layers_size_vector[i+1],1)*2-1
 
-    def single_output(self, input_vector):
-        input_vector = np.vstack([1,input_vector])
-        # print(input_vector)
-        if len(input_vector) != self.layers_size_vector[0]:
-            raise ValueError('Dimensions mismatch!')
-        A = input_vector
-        for i in range(self.number_of_layers):
-            # print(A)
-            # print(self.weights[1].shape, A.shape)
-            #A = self.activation_function(np.dot(self.weights[i], A))# + self.bias[i])
-            A,_ = self.linear_forward(A, i)
-        return A.flatten().tolist()
+    # def single_output(self, input_vector):
+    #     input_vector = np.vstack([1,input_vector])
+    #     # print(input_vector)
+    #     if len(input_vector) != self.layers_size_vector[0]:
+    #         raise ValueError('Dimensions mismatch!')
+    #     A = input_vector
+    #     for i in range(self.number_of_layers):
+    #         # print(A)
+    #         # print(self.weights[1].shape, A.shape)
+    #         #A = self.activation_function(np.dot(self.weights[i], A))# + self.bias[i])
+    #         A,_ = self.linear_forward(A, i)
+    #     return A.flatten().tolist()
 
     def whole_output(self, input_matrix):
-        output_list = []
-        for i in range(input_matrix.shape[1]):
-            output_list.append(self.single_output(input_matrix[:,i][:,np.newaxis]))
-        return np.array(output_list).T
+        number_of_training_examples = input_matrix.shape[1]
+        A = np.vstack([[1] * number_of_training_examples, input_matrix])
+        for i in range(self.number_of_layers):
+            A = self.activation_function(np.dot(self.weights[i], A))
+        return A
 
     def predict(self,input_matrix):
         return np.argmax(self.whole_output(input_matrix), axis=0)
@@ -76,5 +77,6 @@ if __name__ == '__main__':
     b = np.zeros((3, 2))
     b[np.arange(3), a] = 1
     #print(NN.cost_function(np.random.rand(9, 3) * 10, b.T))
-    print(NN.output_layer_cost_derivative(NN.whole_output(np.random.rand(9, 3) * 10), b.T))
-    #print(NN.predict(np.random.rand(9, 3) * 10))
+    #print(NN.output_layer_cost_derivative(NN.whole_output(np.random.rand(9, 3) * 10), b.T))
+    #print(NN.new_whole_output(np.random.rand(9, 3) * 10))
+    print(NN.whole_output(np.random.rand(9, 3) * 10))
