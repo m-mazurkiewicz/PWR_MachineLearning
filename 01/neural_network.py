@@ -56,13 +56,19 @@ class NeuralNetwork:
         return np.dot(self.weights[layer_no], previous_A)
 
     def back_propagation(self, X, Y):
+        self.cost_derivatives = dict()
+        self.weight_derivatives = dict()
         output_matrix = self.whole_output(X)
         self.cost_derivatives[self.number_of_layers - 1] = self.output_layer_cost_derivative(output_matrix, Y)
         for i in reversed(range(self.number_of_layers)):
             dZ = self.cost_derivatives[i] * self.activation_function(self.cache[i][1], grad = True)
-            self.weight_derivatives = dict()
-            self.weight_derivatives[i] = np.dot(dZ, self.cache[i - 1][0].T) / X.shape[1]
+            self.weight_derivatives[i] = np.dot(dZ, self.cache[i][0].T) / X.shape[1]
             self.cost_derivatives[i - 1] = np.dot(self.weights[i].T, dZ)
+
+    def update_weights(self, learning_rate):
+        for i in range(self.number_of_layers):
+            self.weights[i] -= learning_rate * self.weight_derivatives[i]
+
 
 
     def fit(self, learning_rate, epsilon, max_iteration_number = 10000):
@@ -83,7 +89,7 @@ def sigmoid(x, grad = False):
     return s
 
 if __name__ == '__main__':
-    NN = NeuralNetwork(3,[10,20,20,2],sigmoid)
+    NN = NeuralNetwork(3,[10,20,30,2],sigmoid)
     # print(NN.single_output((np.ones((9, 1)) * 10)))
     # print(np.multiply(NN.whole_output(np.ones((9, 3)) * 10),np.ones((2,3))))
     a = np.array([1, 0, 1])
@@ -95,3 +101,4 @@ if __name__ == '__main__':
     #NN.whole_output(np.random.rand(9, 3) * 10)
     #print(NN.cache)
     NN.back_propagation(np.random.rand(9, 3) * 10, b.T)
+    NN.update_weights(3)
