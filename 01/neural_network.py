@@ -42,7 +42,7 @@ class NeuralNetwork:
     def cost_function(self, x, y, _lambda = 0):
         return np.sum(-np.multiply(y,np.log(self.whole_output(x))) - np.multiply((1-y),np.log(1-self.whole_output(x))))/y.shape[1]
 
-    def fit(self, learning_rate, epsilon):
+    def fit(self, learning_rate, epsilon, max_iteration_number = 10000):
         # self.cost_function
         pass
 
