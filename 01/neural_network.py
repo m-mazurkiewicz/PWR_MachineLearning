@@ -40,16 +40,19 @@ class NeuralNetwork:
     def predict(self,input_matrix):
         return np.argmax(self.whole_output(input_matrix), axis=0)
 
-    def cost_function(self, x, y, _lambda = 0):
-        return np.sum(-np.multiply(y,np.log(self.whole_output(x))) - np.multiply((1-y),np.log(1-self.whole_output(x))))/y.shape[1]
-
-    def fit(self, learning_rate, epsilon, max_iteration_number = 10000):
-        # self.cost_function
-        pass
+    def cost_function(self, X, Y, _lambda = 0):
+        return np.sum(-np.multiply(Y, np.log(self.whole_output(X))) - np.multiply((1 - Y), np.log(1 - self.whole_output(X)))) / Y.shape[1]
 
     def linear_forward(self, previous_A, layer_no):
         cache = np.dot(self.weights[layer_no], previous_A)
         return self.activation_function(cache), cache
+
+    def output_layer_cost_derivative(self, output_matrix, Y):
+        return - (np.divide(Y, output_matrix) - np.divide(1 - Y, 1 - output_matrix))
+
+    def fit(self, learning_rate, epsilon, max_iteration_number = 10000):
+        # self.cost_function
+        pass
 
 
 def ReLU(x):
@@ -73,4 +76,5 @@ if __name__ == '__main__':
     b = np.zeros((3, 2))
     b[np.arange(3), a] = 1
     #print(NN.cost_function(np.random.rand(9, 3) * 10, b.T))
-    print(NN.predict(np.random.rand(9, 3) * 10))
+    print(NN.output_layer_cost_derivative(NN.whole_output(np.random.rand(9, 3) * 10), b.T))
+    #print(NN.predict(np.random.rand(9, 3) * 10))
