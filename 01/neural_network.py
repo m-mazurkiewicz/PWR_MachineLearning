@@ -13,10 +13,10 @@ class NeuralNetwork:
 
     def initialise_parameters(self, layers_size_vector):
         self.weights = dict()
-        self.bias = dict()
+        #self.bias = dict()
         for i in range(self.number_of_layers):
             self.weights[i] = np.random.rand(layers_size_vector[i+1],layers_size_vector[i])*2-1
-            self.bias[i] = np.random.rand(layers_size_vector[i+1],1)*2-1
+         #   self.bias[i] = np.random.rand(layers_size_vector[i+1],1)*2-1
 
     def single_output(self, input_vector):
         input_vector = np.vstack([1,input_vector])
@@ -27,7 +27,7 @@ class NeuralNetwork:
         for i in range(self.number_of_layers):
             # print(A)
             # print(self.weights[1].shape, A.shape)
-            A = self.activation_function(np.dot(self.weights[i], A) + self.bias[i])
+            A = self.activation_function(np.dot(self.weights[i], A))# + self.bias[i])
         return A.flatten().tolist()
 
     def whole_output(self, input_matrix):
@@ -36,8 +36,8 @@ class NeuralNetwork:
             output_list.append(self.single_output(input_matrix[:,i][:,np.newaxis]))
         return np.array(output_list).T
 
-    def predict(self,input_vector):
-        pass
+    def predict(self,input_matrix):
+        return np.argmax(self.whole_output(input_matrix), axis=0)
 
     def cost_function(self, x, y, _lambda = 0):
         return np.sum(-np.multiply(y,np.log(self.whole_output(x))) - np.multiply((1-y),np.log(1-self.whole_output(x))))/y.shape[1]
@@ -61,4 +61,5 @@ if __name__ == '__main__':
     a = np.array([1, 0, 1])
     b = np.zeros((3, 2))
     b[np.arange(3), a] = 1
-    print(NN.cost_function(np.random.rand(9, 3) * 10, b.T))
+    #print(NN.cost_function(np.random.rand(9, 3) * 10, b.T))
+    print(NN.predict(np.random.rand(9, 3) * 10))
