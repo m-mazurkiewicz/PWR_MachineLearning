@@ -4,7 +4,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import math
-from neural_network import NeuralNetwork, sigmoid
+from neural_network import NeuralNetwork, sigmoid, ReLU
 
 
 def sigma(x):
@@ -84,14 +84,16 @@ def getGrid(view):
 
 
 numberOfSamples = 300
-samples = getSamples(numberOfSamples)
+# samples = getSamples(numberOfSamples)
 X,Y = getSamples_array(numberOfSamples)
 
 viewX = [-4, 4, 101]
 viewY = [-4, 4, 101]
 
-NN = NeuralNetwork(2,[3,10,2],sigmoid)
-_ = NN.fit(X, Y, 0.003, 1, 0.9995, 1000)
+NN = NeuralNetwork(2, [3, 2, 2], sigmoid)
+costs = NN.fit(X, Y, 0.01, 1, 0.9995, 1000)
+plt.plot(costs,'o-')
+plt.show()
 plotDecisionDomain_our(getGrid(viewX), getGrid(viewY), getDecisionOfFakeNeuralNet_our, NN.whole_output)
 # plotDecisionDomain(getGrid(viewX), getGrid(viewY), getDecisionOfFakeNeuralNet)
 # plotSamplxes(samples)

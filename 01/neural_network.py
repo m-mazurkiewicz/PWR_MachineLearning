@@ -22,6 +22,8 @@ class NeuralNetwork:
         #self.bias = dict()
         for i in range(self.number_of_layers):
             self.weights[i] = np.random.rand(layers_size_vector[i+1],layers_size_vector[i])*2-1
+            # self.weights[i] = np.random.rand(layers_size_vector[i+1],layers_size_vector[i])
+            # self.weights[i] = np.zeros((layers_size_vector[i+1],layers_size_vector[i]))
          #   self.bias[i] = np.random.rand(layers_size_vector[i+1],1)*2-1
 
     # def single_output(self, input_vector):
@@ -54,9 +56,11 @@ class NeuralNetwork:
     def cost_function(self, X, Y, _lambda = 0):
         output,_ = self.whole_output(X)
         return np.sum(-np.multiply(Y, np.log(output)) - np.multiply((1 - Y), np.log(1 - output))) / Y.shape[1]
+        # return 1/2 * np.sum(np.power(Y-output,2)) / Y.shape[1]
 
     def output_layer_cost_derivative(self, output_matrix, Y):
         return - (np.divide(Y, output_matrix) - np.divide(1 - Y, 1 - output_matrix))
+        # return Y - output_matrix
 
     def linear_forward(self, previous_A, layer_no):
         return np.dot(self.weights[layer_no], previous_A)
@@ -70,6 +74,7 @@ class NeuralNetwork:
             dZ = self.cost_derivatives[i] * self.activation_function(self.cache[i][1], grad = True)
             regularisation = regularisation_lambda * self.weights[i]
             regularisation[:,0] = 0
+            # regularisation[0,:] = 0
             self.weight_derivatives[i] = (np.dot(dZ, self.cache[i][0].T) + regularisation) / X.shape[1]
             self.cost_derivatives[i - 1] = np.dot(self.weights[i].T, dZ)
 
@@ -84,7 +89,7 @@ class NeuralNetwork:
                 X = self.min_max_scaler.fit_transform(X)-0.5
             previous_cost_function =  float('inf')
             counter = 0
-            while ((self.cost_function(X, Y) / previous_cost_function <= epsilon) and (counter<max_iteration_number)) or (counter<1):
+            while ((self.cost_function(X, Y) / previous_cost_function <= epsilon) and (counter<max_iteration_number)) or (counter<5):
                 # print(counter, previous_cost_function)
                 previous_cost_function = self.cost_function(X,Y)
                 self.back_propagation(X, Y, regularisation_lambda)
@@ -121,7 +126,6 @@ def getSamples_array(N):
     return X,Y
 
 if __name__ == '__main__':
-    NN = NeuralNetwork(2,[3,10,2],sigmoid)
     # print(NN.single_output((np.ones((9, 1)) * 10)))
     # print(np.multiply(NN.whole_output(np.ones((9, 3)) * 10),np.ones((2,3))))
     a = np.array([1, 0, 1])
@@ -133,11 +137,12 @@ if __name__ == '__main__':
     #NN.whole_output(np.random.rand(9, 3) * 10)
     #print(NN.cache)
     #NN.back_propagation(, b.T)
-    X,Y = getSamples_array(10000)
-    costs = NN.fit(X, Y, 0.003, 1, 0.9995, 1000)
+    X,Y = getSamples_array(300)
+    NN = NeuralNetwork(2,[3,10,2],sigmoid)
+    costs = NN.fit(X, Y, 0.01, 1, 0.9995, 1000)
     plt.plot(costs,'o-')
     plt.show()
     # print(NN.whole_output(X))
-    print(NN.predict(X).any())
-    print(NN.predict(X).all())
-    print(Y[1,:].any())
+    # print(NN.predict(X).any())
+    # print(NN.predict(X).all())
+    # print(Y[1,:].any())
