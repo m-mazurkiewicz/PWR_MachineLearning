@@ -7,7 +7,7 @@ class NeuralNetwork:
 
     min_max_scaler = preprocessing.MinMaxScaler()
 
-    def __init__(self, number_of_layers, layers_size_vector, activation_function):
+    def __init__(self, number_of_layers, layers_size_vector, activation_function, cost_function):
         if number_of_layers != len(layers_size_vector)-1:
             raise ValueError('Inconsistent input parameters!')
         self.activation_function = activation_function
@@ -16,6 +16,7 @@ class NeuralNetwork:
         self.layers_size_vector = layers_size_vector
         self.cache = []
         self.fitted = False
+        self.cost_function = cost_function
 
     def initialise_parameters(self, layers_size_vector):
         self.weights = dict()
@@ -57,14 +58,18 @@ class NeuralNetwork:
         # print(output)
         return np.argmax(output, axis=0)
 
-    def cost_function(self, X, Y, _lambda = 0):
+    def cost_function_evaluation(self, X, Y, _lambda = 0):
         output = self.whole_output(X)
-        return np.sum(-np.multiply(Y, np.log(output)) - np.multiply((1 - Y), np.log(1 - output))) / Y.shape[1]
-        # return 1/2 * np.sum(np.power(Y-output,2)) / Y.shape[1]
+        if self.cost_function == 'cross-entropy':
+            return np.sum(-np.multiply(Y, np.log(output)) - np.multiply((1 - Y), np.log(1 - output))) / Y.shape[1]
+        elif self.cost_function == 'euclidean_distance':
+            return 1/2 * np.sum(np.power(Y-output,2)) / Y.shape[1]
 
     def output_layer_cost_derivative(self, output_matrix, Y):
-        return - (np.divide(Y, output_matrix) - np.divide(1 - Y, 1 - output_matrix))
-        # return Y - output_matrix
+        if self.cost_function == 'cross-entropy':
+            return - (np.divide(Y, output_matrix) - np.divide(1 - Y, 1 - output_matrix))
+        elif self.cost_function == 'euclidean_distance':
+            return -(Y - output_matrix)
 
     def back_propagation(self, X, Y, regularisation_lambda):
         self.cost_derivatives = dict()
@@ -91,14 +96,14 @@ class NeuralNetwork:
                 X = self.min_max_scaler.fit_transform(X)-0.5
             previous_cost_function =  float('inf')
             counter = 0
-            while ((self.cost_function(X, Y) / previous_cost_function <= epsilon) and (counter<max_iteration_number)) or (counter<5):
+            while ((self.cost_function_evaluation(X, Y) / previous_cost_function <= epsilon) and (counter<max_iteration_number)) or (counter<5):
                 # print(counter, previous_cost_function)
-                previous_cost_function = self.cost_function(X,Y)
+                previous_cost_function = self.cost_function_evaluation(X,Y)
                 self.back_propagation(X, Y, regularisation_lambda)
                 self.update_weights(learning_rate)
                 counter +=1
                 # print(counter, self.cost_function(X,Y)/previous_cost_function)
-                costs.append(self.cost_function(X,Y))
+                costs.append(self.cost_function_evaluation(X,Y))
             self.fitted = True
             return costs
         else:
@@ -145,7 +150,7 @@ if __name__ == '__main__':
     #print(NN.cache)
     #NN.back_propagation(, b.T)
     X,Y = getSamples_array(300)
-    NN = NeuralNetwork(2,[2,2,2],sigmoid)
+    NN = NeuralNetwork(2,[2,2,2],sigmoid,'cross-entropy')
     # costs = NN.fit(X, Y, 0.01, 0, 0.9995, 1000)
     # plt.plot(costs,'o-')
     # plt.show()
