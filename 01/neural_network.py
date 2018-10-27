@@ -83,7 +83,7 @@ class NeuralNetwork:
                 X = self.min_max_scaler.fit_transform(X)-0.5
             previous_cost_function =  float('inf')
             counter = 0
-            while ((self.cost_function(X, Y) / previous_cost_function <= epsilon) and (counter<max_iteration_number)) or (counter<5):
+            while ((self.cost_function(X, Y) / previous_cost_function <= epsilon) and (counter<max_iteration_number)) or (counter<1):
                 # print(counter, previous_cost_function)
                 previous_cost_function = self.cost_function(X,Y)
                 self.back_propagation(X, Y, regularisation_lambda)
@@ -109,8 +109,18 @@ def sigmoid(x, grad = False):
         return s * (1 - s)
     return s
 
+def getSamples_array(N):
+    X = np.random.normal(size=(2, N))
+    Y = np.zeros((2, N))
+    for i in range(N):
+        if (X[0, i] > 0) and (X[1, i] < 0):
+            Y[1, i] = 1
+        else:
+            Y[0, i] = 1
+    return X,Y
+
 if __name__ == '__main__':
-    NN = NeuralNetwork(3,[10,20,30,2],sigmoid)
+    NN = NeuralNetwork(3,[3,20,20,2],sigmoid)
     # print(NN.single_output((np.ones((9, 1)) * 10)))
     # print(np.multiply(NN.whole_output(np.ones((9, 3)) * 10),np.ones((2,3))))
     a = np.array([1, 0, 1])
@@ -122,6 +132,7 @@ if __name__ == '__main__':
     #NN.whole_output(np.random.rand(9, 3) * 10)
     #print(NN.cache)
     #NN.back_propagation(, b.T)
-    costs = NN.fit(np.random.rand(9, 3) * 10, b.T, 0.01, 0.3, 0.9995, 1000)
+    X,Y = getSamples_array(1000)
+    costs = NN.fit(X, Y, 0.003, 1, 0.9995, 1000)
     plt.plot(costs,'o-')
     plt.show()
