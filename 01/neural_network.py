@@ -11,6 +11,7 @@ class NeuralNetwork:
         self.initialise_parameters(layers_size_vector)
         self.layers_size_vector = layers_size_vector
         self.cache = []
+        self.fitted = False
 
     def initialise_parameters(self, layers_size_vector):
         self.weights = dict()
@@ -70,12 +71,16 @@ class NeuralNetwork:
             self.weights[i] -= learning_rate * self.weight_derivatives[i]
 
     def fit(self, X, Y, learning_rate, epsilon, max_iteration_number = 10000):
-        previous_cost_function = float('inf')
-        counter = 0
-        while (self.cost_function(X, Y) / previous_cost_function < epsilon) and (counter<max_iteration_number):
-            self.back_propagation(X, Y)
-            self.update_weights(learning_rate)
-            counter +=1
+        if not self.fitted:
+            previous_cost_function = float('inf')
+            counter = 0
+            while (self.cost_function(X, Y) / previous_cost_function < epsilon) and (counter<max_iteration_number):
+                self.back_propagation(X, Y)
+                self.update_weights(learning_rate)
+                counter +=1
+            self.fitted = True
+        else:
+            raise Exception("Neural network already fitted!")
 
 
 def ReLU(x, grad = False):
@@ -103,4 +108,4 @@ if __name__ == '__main__':
     #NN.whole_output(np.random.rand(9, 3) * 10)
     #print(NN.cache)
     #NN.back_propagation(, b.T)
-    NN.fit(np.random.rand(9, 3) * 10, b.T, 3, .9, 100)
+    NN.fit(np.random.rand(9, 3) * 10, b.T, 3, .9, 1)
