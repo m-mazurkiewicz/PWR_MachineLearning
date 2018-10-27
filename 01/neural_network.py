@@ -10,8 +10,11 @@ class NeuralNetwork:
     def __init__(self, number_of_layers, layers_size_vector, activation_function, cost_function = 'cross-entropy'):
         if number_of_layers != len(layers_size_vector)-1:
             raise ValueError('Inconsistent input parameters!')
-        self.activation_function = activation_function
         self.number_of_layers = number_of_layers
+        if type(activation_function) is list:
+            self.activation_function = activation_function
+        else:
+            self.activation_function = [activation_function] * self.number_of_layers
         self.initialise_parameters(layers_size_vector)
         self.layers_size_vector = layers_size_vector
         self.cache = []
@@ -46,7 +49,7 @@ class NeuralNetwork:
         for i in range(self.number_of_layers):
             Z = self.linear_forward(A, i)
             self.cache.append((A, Z))
-            A = self.activation_function(Z)
+            A = self.activation_function[i](Z)
         return A
 
     def linear_forward(self, previous_A, layer_no):
@@ -77,7 +80,7 @@ class NeuralNetwork:
         self.bias_derivatives = dict()
         self.cost_derivatives[self.number_of_layers - 1] = self.output_layer_cost_derivative(self.whole_output(X), Y)
         for i in reversed(range(self.number_of_layers)):
-            dZ = self.cost_derivatives[i] * self.activation_function(self.cache[i][1], grad = True)
+            dZ = self.cost_derivatives[i] * self.activation_function[i](self.cache[i][1], grad = True)
             self.weight_derivatives[i] = (np.dot(dZ, self.cache[i][0].T) + regularisation_lambda * self.weights[i]) / X.shape[1]
             # self.bias_derivatives[i] = np.squeeze(np.sum(dZ, axis=1, keepdims=True)) / X.shape[1]
             self.bias_derivatives[i] = np.sum(dZ, axis=1, keepdims=True) / X.shape[1]
@@ -150,7 +153,7 @@ if __name__ == '__main__':
     #print(NN.cache)
     #NN.back_propagation(, b.T)
     X,Y = getSamples_array(300)
-    NN = NeuralNetwork(2,[2,2,2],sigmoid,'cross-entropy')
+    NN = NeuralNetwork(2,[2,2,2],[sigmoid, ReLU],'cross-entropy')
     # costs = NN.fit(X, Y, 0.01, 0, 0.9995, 1000)
     # plt.plot(costs,'o-')
     # plt.show()
