@@ -45,6 +45,7 @@ def getSamples_array(N):
     Y = np.zeros((2, N),dtype='int')
     for i in range(N):
         if (X[0, i] > 0) and (X[1, i] < 0):
+        # if X[1, i] > 0:
             Y[1, i] = 1
         else:
             Y[0, i] = 1
@@ -76,27 +77,28 @@ def plotSamples_array(X,Y):
     colors = ['red', 'gray']
     for sample in range(X.shape[1]):
         plt.scatter(X[0,sample], X[1,sample],
-                    marker=markers[Y[0,sample]], color=colors[Y[0,sample]],
+                    marker=markers[Y[1,sample]], color=colors[Y[1,sample]],
                     alpha=0.5)
 
 def getGrid(view):
     return [view[0] + (view[1] - view[0]) * i / (view[2] - 1) for i in range(view[2])]
 
 
-numberOfSamples = 300
-# samples = getSamples(numberOfSamples)
-X,Y = getSamples_array(numberOfSamples)
+numberOfSamples = 3000
 
 viewX = [-4, 4, 101]
 viewY = [-4, 4, 101]
 
-NN = NeuralNetwork(2, [2, 20, 2], sigmoid)
-costs = NN.fit(X, Y, 0.03, 1, 0.9995, 1000)
+X,Y = getSamples_array(numberOfSamples)
+NN = NeuralNetwork(4, [2, 100,100,100, 2], sigmoid)
+costs = NN.fit(X, Y, 0.09, 3, 0.99999, 10000)
 plt.plot(costs,'o-')
 plt.show()
+# NN.set_weights([(np.array([[1, 0.01],[0.01, 1]]), np.array([[0],[0]])),(np.array([[1, -1],[-1, 1]]),np.array([[0.3],[-0.3]]))])
 plotDecisionDomain_our(getGrid(viewX), getGrid(viewY), getDecisionOfFakeNeuralNet_our, NN.whole_output)
-# plotDecisionDomain(getGrid(viewX), getGrid(viewY), getDecisionOfFakeNeuralNet)
-# plotSamplxes(samples)
-# print(NN.predict(X))
 plotSamples_array(X,Y)
 plt.show()
+# samples = getSamples(numberOfSamples)
+# plotDecisionDomain(getGrid(viewX), getGrid(viewY), getDecisionOfFakeNeuralNet)
+# plotSamples(samples)
+# plt.show()
