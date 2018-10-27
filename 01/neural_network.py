@@ -7,7 +7,7 @@ class NeuralNetwork:
 
     min_max_scaler = preprocessing.MinMaxScaler()
 
-    def __init__(self, number_of_layers, layers_size_vector, activation_function, cost_function):
+    def __init__(self, number_of_layers, layers_size_vector, activation_function, cost_function = 'cross-entropy'):
         if number_of_layers != len(layers_size_vector)-1:
             raise ValueError('Inconsistent input parameters!')
         self.activation_function = activation_function
