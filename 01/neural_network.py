@@ -83,7 +83,7 @@ class NeuralNetwork:
                 X = self.min_max_scaler.fit_transform(X)-0.5
             previous_cost_function =  float('inf')
             counter = 0
-            while (self.cost_function(X, Y) / previous_cost_function <= epsilon) and (counter<max_iteration_number):
+            while ((self.cost_function(X, Y) / previous_cost_function <= epsilon) and (counter<max_iteration_number)) or (counter<5):
                 # print(counter, previous_cost_function)
                 previous_cost_function = self.cost_function(X,Y)
                 self.back_propagation(X, Y, regularisation_lambda)
@@ -122,6 +122,6 @@ if __name__ == '__main__':
     #NN.whole_output(np.random.rand(9, 3) * 10)
     #print(NN.cache)
     #NN.back_propagation(, b.T)
-    costs = NN.fit(np.random.rand(9, 3) * 10, b.T, 0.01, 0.5, 0.9995, 1000)
+    costs = NN.fit(np.random.rand(9, 3) * 10, b.T, 0.01, 0.3, 0.9995, 1000)
     plt.plot(costs,'o-')
     plt.show()
