@@ -4,7 +4,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import math
-from neural_network import NeuralNetwork
+from neural_network import NeuralNetwork, sigmoid
 
 
 def sigma(x):
@@ -25,7 +25,8 @@ def getDecisionOfFakeNeuralNet(x, y):
 
 
 def getDecisionOfFakeNeuralNet_our(x, y, output_function):
-    output = output_function(np.array([[x, y]]).T)
+    output = output_function(np.array([[x, y]]).T).flatten().tolist()
+    # print(output)
     return 1 if output[1] > output[0] else 0
 
 
@@ -41,7 +42,7 @@ def getSamples(N):
 
 def getSamples_array(N):
     X = np.random.normal(size=(2, N))
-    Y = np.zeros((2, N))
+    Y = np.zeros((2, N),dtype='int')
     for i in range(N):
         if (X[0, i] > 0) and (X[1, i] < 0):
             Y[1, i] = 1
@@ -70,6 +71,13 @@ def plotSamples(samples):
                     marker=markers[sample[2]], color=colors[sample[2]],
                     alpha=0.5)
 
+def plotSamples_array(X,Y):
+    markers = ['o', 'x']
+    colors = ['red', 'gray']
+    for sample in range(X.shape[1]):
+        plt.scatter(X[0,sample], X[1,sample],
+                    marker=markers[Y[0,sample]], color=colors[Y[0,sample]],
+                    alpha=0.5)
 
 def getGrid(view):
     return [view[0] + (view[1] - view[0]) * i / (view[2] - 1) for i in range(view[2])]
@@ -77,12 +85,16 @@ def getGrid(view):
 
 numberOfSamples = 300
 samples = getSamples(numberOfSamples)
+X,Y = getSamples_array(numberOfSamples)
 
 viewX = [-4, 4, 101]
 viewY = [-4, 4, 101]
 
-# NN = NeuralNetwork(3, [3, 20, 20, 2], sigma)
-# plotDecisionDomain_our(getGrid(viewX), getGrid(viewY), getDecisionOfFakeNeuralNet_our, NN.single_output)
-plotDecisionDomain(getGrid(viewX), getGrid(viewY), getDecisionOfFakeNeuralNet)
-plotSamples(samples)
+NN = NeuralNetwork(2,[3,10,2],sigmoid)
+_ = NN.fit(X, Y, 0.003, 1, 0.9995, 1000)
+plotDecisionDomain_our(getGrid(viewX), getGrid(viewY), getDecisionOfFakeNeuralNet_our, NN.whole_output)
+# plotDecisionDomain(getGrid(viewX), getGrid(viewY), getDecisionOfFakeNeuralNet)
+# plotSamplxes(samples)
+# print(NN.predict(X))
+plotSamples_array(X,Y)
 plt.show()
