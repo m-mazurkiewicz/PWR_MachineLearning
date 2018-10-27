@@ -90,8 +90,8 @@ X,Y = getSamples_array(numberOfSamples)
 viewX = [-4, 4, 101]
 viewY = [-4, 4, 101]
 
-NN = NeuralNetwork(2, [3, 2, 2], sigmoid)
-costs = NN.fit(X, Y, 0.01, 1, 0.9995, 1000)
+NN = NeuralNetwork(2, [2, 20, 2], sigmoid)
+costs = NN.fit(X, Y, 0.03, 1, 0.9995, 1000)
 plt.plot(costs,'o-')
 plt.show()
 plotDecisionDomain_our(getGrid(viewX), getGrid(viewY), getDecisionOfFakeNeuralNet_our, NN.whole_output)
