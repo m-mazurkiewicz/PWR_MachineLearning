@@ -104,6 +104,11 @@ class NeuralNetwork:
         else:
             raise Exception("Neural network already fitted!")
 
+    def set_weights(self, list_of_parameters):
+        for layer_no, parameters in enumerate(list_of_parameters):
+            self.weights[layer_no] = parameters[0]
+            self.bias[layer_no] = parameters[1]
+
 
 def ReLU(x, grad = False):
     if grad == True:
@@ -140,10 +145,12 @@ if __name__ == '__main__':
     #print(NN.cache)
     #NN.back_propagation(, b.T)
     X,Y = getSamples_array(300)
-    NN = NeuralNetwork(2,[2,10,2],sigmoid)
-    costs = NN.fit(X, Y, 0.01, 0, 0.9995, 1000)
-    plt.plot(costs,'o-')
-    plt.show()
+    NN = NeuralNetwork(2,[2,2,2],sigmoid)
+    # costs = NN.fit(X, Y, 0.01, 0, 0.9995, 1000)
+    # plt.plot(costs,'o-')
+    # plt.show()
+    NN.set_weights([(np.array([[1, 0.01],[0.01, 1]]), np.array([[0],[0]])),(np.array([[1, -1],[-1, 1]]),np.array([[0.3],[-0.3]]))])
+    NN.predict(X)
     # print(NN.whole_output(X))
     # print(NN.predict(X).any())
     # print(NN.predict(X).all())
