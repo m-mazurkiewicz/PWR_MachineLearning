@@ -1,5 +1,7 @@
 import numpy as np
+from sklearn import preprocessing
 
+min_max_scaler = preprocessing.MinMaxScaler()
 
 class NeuralNetwork:
 
@@ -70,8 +72,10 @@ class NeuralNetwork:
         for i in range(self.number_of_layers):
             self.weights[i] -= learning_rate * self.weight_derivatives[i]
 
-    def fit(self, X, Y, learning_rate, epsilon, max_iteration_number = 10000):
+    def fit(self, X, Y, learning_rate, epsilon, max_iteration_number = 10000, min_max_normalization = True):
         if not self.fitted:
+            if min_max_normalization:
+                X = min_max_scaler.fit_transform(X)-0.5
             previous_cost_function = float('inf')
             counter = 0
             while (self.cost_function(X, Y) / previous_cost_function < epsilon) and (counter<max_iteration_number):
@@ -108,4 +112,4 @@ if __name__ == '__main__':
     #NN.whole_output(np.random.rand(9, 3) * 10)
     #print(NN.cache)
     #NN.back_propagation(, b.T)
-    NN.fit(np.random.rand(9, 3) * 10, b.T, 3, .9, 1)
+    NN.fit(np.random.rand(9, 3) * 10, b.T, 3, .9, 10)
