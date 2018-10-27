@@ -19,12 +19,12 @@ class NeuralNetwork:
 
     def initialise_parameters(self, layers_size_vector):
         self.weights = dict()
-        #self.bias = dict()
+        self.bias = dict()
         for i in range(self.number_of_layers):
             self.weights[i] = np.random.rand(layers_size_vector[i+1],layers_size_vector[i])*2-1
             # self.weights[i] = np.random.rand(layers_size_vector[i+1],layers_size_vector[i])
             # self.weights[i] = np.zeros((layers_size_vector[i+1],layers_size_vector[i]))
-         #   self.bias[i] = np.random.rand(layers_size_vector[i+1],1)*2-1
+            self.bias[i] = np.random.rand(layers_size_vector[i+1],1)*2-1
 
     # def single_output(self, input_vector):
     #     input_vector = np.vstack([1,input_vector])
@@ -39,14 +39,18 @@ class NeuralNetwork:
     #         A,_ = self.linear_forward(A, i)
     #     return A.flatten().tolist()
 
-    def whole_output(self, input_matrix):
-        number_of_training_examples = input_matrix.shape[1]
-        A = np.vstack([[1] * number_of_training_examples, input_matrix])
+    def whole_output(self, A):
+        # number_of_training_examples = input_matrix.shape[1]
+        # A = np.vstack([[1] * number_of_training_examples, input_matrix])
         for i in range(self.number_of_layers):
             Z = self.linear_forward(A, i)
             self.cache.append((A, Z))
             A = self.activation_function(Z)
         return A
+
+    def linear_forward(self, previous_A, layer_no):
+        # print(np.dot(self.weights[layer_no], previous_A).shape,self.bias[layer_no].shape)
+        return np.dot(self.weights[layer_no], previous_A)+self.bias[layer_no]
 
     def predict(self,input_matrix):
         output = self.whole_output(input_matrix)
@@ -54,7 +58,7 @@ class NeuralNetwork:
         return np.argmax(output, axis=0)
 
     def cost_function(self, X, Y, _lambda = 0):
-        output,_ = self.whole_output(X)
+        output = self.whole_output(X)
         return np.sum(-np.multiply(Y, np.log(output)) - np.multiply((1 - Y), np.log(1 - output))) / Y.shape[1]
         # return 1/2 * np.sum(np.power(Y-output,2)) / Y.shape[1]
 
@@ -62,25 +66,23 @@ class NeuralNetwork:
         return - (np.divide(Y, output_matrix) - np.divide(1 - Y, 1 - output_matrix))
         # return Y - output_matrix
 
-    def linear_forward(self, previous_A, layer_no):
-        return np.dot(self.weights[layer_no], previous_A)
-
     def back_propagation(self, X, Y, regularisation_lambda):
         self.cost_derivatives = dict()
         self.weight_derivatives = dict()
-        output_matrix = self.whole_output(X)
-        self.cost_derivatives[self.number_of_layers - 1] = self.output_layer_cost_derivative(output_matrix, Y)
+        self.bias_derivatives = dict()
+        self.cost_derivatives[self.number_of_layers - 1] = self.output_layer_cost_derivative(self.whole_output(X), Y)
         for i in reversed(range(self.number_of_layers)):
             dZ = self.cost_derivatives[i] * self.activation_function(self.cache[i][1], grad = True)
-            regularisation = regularisation_lambda * self.weights[i]
-            regularisation[:,0] = 0
-            # regularisation[0,:] = 0
-            self.weight_derivatives[i] = (np.dot(dZ, self.cache[i][0].T) + regularisation) / X.shape[1]
+            self.weight_derivatives[i] = (np.dot(dZ, self.cache[i][0].T) + regularisation_lambda * self.weights[i]) / X.shape[1]
+            # self.bias_derivatives[i] = np.squeeze(np.sum(dZ, axis=1, keepdims=True)) / X.shape[1]
+            self.bias_derivatives[i] = np.sum(dZ, axis=1, keepdims=True) / X.shape[1]
             self.cost_derivatives[i - 1] = np.dot(self.weights[i].T, dZ)
 
     def update_weights(self, learning_rate):
         for i in range(self.number_of_layers):
             self.weights[i] -= learning_rate * self.weight_derivatives[i]
+            # print(self.bias_derivatives[i],self.bias[i])
+            self.bias[i] -= learning_rate * self.bias_derivatives[i]
 
     def fit(self, X, Y, learning_rate, regularisation_lambda, epsilon,max_iteration_number = 10000, min_max_normalization = True):
         costs = []
@@ -138,8 +140,8 @@ if __name__ == '__main__':
     #print(NN.cache)
     #NN.back_propagation(, b.T)
     X,Y = getSamples_array(300)
-    NN = NeuralNetwork(2,[3,10,2],sigmoid)
-    costs = NN.fit(X, Y, 0.01, 1, 0.9995, 1000)
+    NN = NeuralNetwork(2,[2,10,2],sigmoid)
+    costs = NN.fit(X, Y, 0.01, 0, 0.9995, 1000)
     plt.plot(costs,'o-')
     plt.show()
     # print(NN.whole_output(X))
