@@ -1,9 +1,11 @@
 import numpy as np
 from sklearn import preprocessing
+from matplotlib import pyplot as plt
 
-min_max_scaler = preprocessing.MinMaxScaler()
 
 class NeuralNetwork:
+
+    min_max_scaler = preprocessing.MinMaxScaler()
 
     def __init__(self, number_of_layers, layers_size_vector, activation_function):
         if number_of_layers != len(layers_size_vector)-1:
@@ -58,31 +60,39 @@ class NeuralNetwork:
     def linear_forward(self, previous_A, layer_no):
         return np.dot(self.weights[layer_no], previous_A)
 
-    def back_propagation(self, X, Y):
+    def back_propagation(self, X, Y, regularisation_lambda):
         self.cost_derivatives = dict()
         self.weight_derivatives = dict()
         output_matrix = self.whole_output(X)
         self.cost_derivatives[self.number_of_layers - 1] = self.output_layer_cost_derivative(output_matrix, Y)
         for i in reversed(range(self.number_of_layers)):
             dZ = self.cost_derivatives[i] * self.activation_function(self.cache[i][1], grad = True)
-            self.weight_derivatives[i] = np.dot(dZ, self.cache[i][0].T) / X.shape[1]
+            regularisation = regularisation_lambda * self.weights[i]
+            regularisation[0,:] = 0
+            self.weight_derivatives[i] = (np.dot(dZ, self.cache[i][0].T) + regularisation) / X.shape[1]
             self.cost_derivatives[i - 1] = np.dot(self.weights[i].T, dZ)
 
     def update_weights(self, learning_rate):
         for i in range(self.number_of_layers):
             self.weights[i] -= learning_rate * self.weight_derivatives[i]
 
-    def fit(self, X, Y, learning_rate, epsilon, max_iteration_number = 10000, min_max_normalization = True):
+    def fit(self, X, Y, learning_rate, regularisation_lambda, epsilon,max_iteration_number = 10000, min_max_normalization = True):
+        costs = []
         if not self.fitted:
             if min_max_normalization:
-                X = min_max_scaler.fit_transform(X)-0.5
-            previous_cost_function = float('inf')
+                X = self.min_max_scaler.fit_transform(X)-0.5
+            previous_cost_function =  float('inf')
             counter = 0
-            while (self.cost_function(X, Y) / previous_cost_function < epsilon) and (counter<max_iteration_number):
-                self.back_propagation(X, Y)
+            while (self.cost_function(X, Y) / previous_cost_function <= epsilon) and (counter<max_iteration_number):
+                # print(counter, previous_cost_function)
+                previous_cost_function = self.cost_function(X,Y)
+                self.back_propagation(X, Y, regularisation_lambda)
                 self.update_weights(learning_rate)
                 counter +=1
+                # print(counter, self.cost_function(X,Y)/previous_cost_function)
+                costs.append(self.cost_function(X,Y))
             self.fitted = True
+            return costs
         else:
             raise Exception("Neural network already fitted!")
 
@@ -112,4 +122,6 @@ if __name__ == '__main__':
     #NN.whole_output(np.random.rand(9, 3) * 10)
     #print(NN.cache)
     #NN.back_propagation(, b.T)
-    NN.fit(np.random.rand(9, 3) * 10, b.T, 3, .9, 10)
+    costs = NN.fit(np.random.rand(9, 3) * 10, b.T, 0.01, 0.5, 0.9995, 1000)
+    plt.plot(costs,'o-')
+    plt.show()
