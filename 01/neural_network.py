@@ -68,7 +68,7 @@ class NeuralNetwork:
         for i in reversed(range(self.number_of_layers)):
             dZ = self.cost_derivatives[i] * self.activation_function(self.cache[i][1], grad = True)
             regularisation = regularisation_lambda * self.weights[i]
-            regularisation[0,:] = 0
+            regularisation[:,0] = 0
             self.weight_derivatives[i] = (np.dot(dZ, self.cache[i][0].T) + regularisation) / X.shape[1]
             self.cost_derivatives[i - 1] = np.dot(self.weights[i].T, dZ)
 
