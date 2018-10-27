@@ -47,7 +47,8 @@ class NeuralNetwork:
         return A
 
     def predict(self,input_matrix):
-        output, _ = self.whole_output(input_matrix)
+        output = self.whole_output(input_matrix)
+        # print(output)
         return np.argmax(output, axis=0)
 
     def cost_function(self, X, Y, _lambda = 0):
@@ -120,7 +121,7 @@ def getSamples_array(N):
     return X,Y
 
 if __name__ == '__main__':
-    NN = NeuralNetwork(3,[3,20,20,2],sigmoid)
+    NN = NeuralNetwork(2,[3,10,2],sigmoid)
     # print(NN.single_output((np.ones((9, 1)) * 10)))
     # print(np.multiply(NN.whole_output(np.ones((9, 3)) * 10),np.ones((2,3))))
     a = np.array([1, 0, 1])
@@ -132,7 +133,11 @@ if __name__ == '__main__':
     #NN.whole_output(np.random.rand(9, 3) * 10)
     #print(NN.cache)
     #NN.back_propagation(, b.T)
-    X,Y = getSamples_array(1000)
+    X,Y = getSamples_array(10000)
     costs = NN.fit(X, Y, 0.003, 1, 0.9995, 1000)
     plt.plot(costs,'o-')
     plt.show()
+    # print(NN.whole_output(X))
+    print(NN.predict(X).any())
+    print(NN.predict(X).all())
+    print(Y[1,:].any())
