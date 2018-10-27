@@ -27,6 +27,7 @@ def getDecisionOfFakeNeuralNet(x, y):
 def getDecisionOfFakeNeuralNet_our(x, y, output_function):
     output = output_function(np.array([[x, y]]).T).flatten().tolist()
     # print(output)
+    # print(np.abs(output[1]-output[0]))
     return 1 if output[1] > output[0] else 0
 
 
@@ -96,9 +97,10 @@ viewX = [-4, 4, 101]
 viewY = [-4, 4, 101]
 
 X,Y = getSamples_array(numberOfSamples)
-NN = NeuralNetwork(3, [2, 20, 20, 2], sigmoid,'cross-entropy')
-# NN = NeuralNetwork(4, [2, 10,10,10, 2], sigmoid,'euclidean_distance')
-costs = NN.fit(X, Y, 0.01, 3, 0.9999, 10000)
+NN = NeuralNetwork(3, [2, 10, 10, 2], sigmoid,'cross-entropy')
+# NN = NeuralNetwork(3, [2, 20,20, 2], sigmoid,'euclidean_distance')
+# NN = NeuralNetwork(2, [2, 200, 2], sigmoid,'euclidean_distance')
+costs = NN.fit(X, Y, 0.03, 3, 0.9999, 10000)
 plt.plot(costs,'o-')
 plt.show()
 # NN = NeuralNetwork(2, [2, 2, 2], sigmoid)
