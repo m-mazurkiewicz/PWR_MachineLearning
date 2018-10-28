@@ -96,11 +96,14 @@ numberOfSamples = 1000
 viewX = [-4, 4, 101]
 viewY = [-4, 4, 101]
 
-X,Y = getSamples_array(numberOfSamples)
-NN = NeuralNetwork(3, [2, 10, 10, 2], sigmoid,'cross-entropy')
-# NN = NeuralNetwork(3, [2, 20,20, 2], sigmoid,'euclidean_distance')
+X,Y = getSamples_array(numberOfSamples, balanced=False)
+# NN = NeuralNetwork(3, [2, 10, 10, 2], sigmoid,'cross-entropy')
+# NN = NeuralNetwork(2, [2, 10, 2], ReLU,'euclidean_distance')
+# NN = NeuralNetwork(3, [2, 20, 20, 2], [ReLU,sigmoid, ReLU],'euclidean_distance')
 # NN = NeuralNetwork(2, [2, 200, 2], sigmoid,'euclidean_distance')
-costs = NN.fit(X, Y, 0.03, 3, 0.9999, 10000)
+NN = NeuralNetwork(2, [2,2,2], sigmoid, 'euclidean_distance')
+NN.set_weights([(np.array([[1., 0.01],[0.01, 1.]]), np.array([[0.],[0.]])),(np.array([[1., -1.],[-1., 1.]]),np.array([[0.3],[-0.3]]))])
+costs = NN.fit(X, Y, 0.001, 1, 0.9999, 10000)
 plt.plot(costs,'o-')
 plt.show()
 # NN = NeuralNetwork(2, [2, 2, 2], sigmoid)
