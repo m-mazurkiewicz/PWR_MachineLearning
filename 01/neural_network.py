@@ -1,6 +1,9 @@
 import numpy as np
 from sklearn import preprocessing
 from matplotlib import pyplot as plt
+import autograd.numpy as np_autograd
+from autograd import jacobian, grad
+from autograd import elementwise_grad as egrad
 
 
 class NeuralNetwork:
@@ -130,6 +133,19 @@ def sigmoid(x, grad = False):
         return s * (1 - s)
     return s
 
+
+def softmax(x, grad = False):
+    def softmax_eval(x):
+        e_x = np_autograd.exp(x - np_autograd.max(x))
+        return e_x / e_x.sum(axis=0)
+        # y = np_autograd.exp(-2.0 * x)
+        # return (1.0 - y) / (1.0 + y)
+    softmax_eval_grad = egrad(softmax_eval)
+    if grad:
+        return softmax_eval_grad(x)
+    else:
+        return softmax_eval(x)
+
 def getSamples_array(N):
     X = np.random.normal(size=(2, N))
     Y = np.zeros((2, N))
@@ -153,12 +169,13 @@ if __name__ == '__main__':
     #print(NN.cache)
     #NN.back_propagation(, b.T)
     X,Y = getSamples_array(300)
-    NN = NeuralNetwork(2,[2,2,2],[sigmoid, ReLU],'cross-entropy')
-    # costs = NN.fit(X, Y, 0.01, 0, 0.9995, 1000)
-    # plt.plot(costs,'o-')
-    # plt.show()
-    NN.set_weights([(np.array([[1, 0.01],[0.01, 1]]), np.array([[0],[0]])),(np.array([[1, -1],[-1, 1]]),np.array([[0.3],[-0.3]]))])
-    NN.predict(X)
+    NN = NeuralNetwork(2,[2,2,2],[sigmoid, softmax],'cross-entropy')
+    costs = NN.fit(X, Y, 0.001, 1, 0.9995, 1000)
+    plt.plot(costs,'o-')
+    plt.show()
+    # print(NN.whole_output(X))
+    # NN.set_weights([(np.array([[1, 0.01],[0.01, 1]]), np.array([[0],[0]])),(np.array([[1, -1],[-1, 1]]),np.array([[0.3],[-0.3]]))])
+    # NN.predict(X)
     # print(NN.whole_output(X))
     # print(NN.predict(X).any())
     # print(NN.predict(X).all())
