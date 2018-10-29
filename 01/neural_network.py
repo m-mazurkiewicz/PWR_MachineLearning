@@ -22,10 +22,11 @@ class NeuralNetwork:
         self.weights = dict()
         self.bias = dict()
         for i in range(self.number_of_layers):
-            self.weights[i] = np.random.rand(layers_size_vector[i+1],layers_size_vector[i])*10
+            self.weights[i] = np.random.rand(layers_size_vector[i+1],layers_size_vector[i])
             # self.weights[i] = np.random.rand(layers_size_vector[i+1],layers_size_vector[i])
             # self.weights[i] = np.zeros((layers_size_vector[i+1],layers_size_vector[i]))
-            self.bias[i] = np.random.rand(layers_size_vector[i+1],1)*2-1
+            self.bias[i] = np.zeros((layers_size_vector[i], 1))
+            #self.bias[i] = np.random.rand(layers_size_vector[i+1],1)*2-1
 
     # def single_output(self, input_vector):
     #     input_vector = np.vstack([1,input_vector])
@@ -138,25 +139,29 @@ def getSamples_array(N):
     return X,Y
 
 if __name__ == '__main__':
+    X, Y = getSamples_array(10)
+    NN = NeuralNetwork(3, [X.shape[0], 20, 3, 1], sigmoid, 'cross-entropy')
+    NN.initialise_parameters(NN.layers_size_vector)
+
     # print(NN.single_output((np.ones((9, 1)) * 10)))
     # print(np.multiply(NN.whole_output(np.ones((9, 3)) * 10),np.ones((2,3))))
-    a = np.array([1, 0, 1])
-    b = np.zeros((3, 2))
-    b[np.arange(3), a] = 1
-    #print(NN.cost_function(np.random.rand(9, 3) * 10, b.T))
-    #print(NN.output_layer_cost_derivative(NN.whole_output(np.random.rand(9, 3) * 10), b.T))
-    #print()
-    #NN.whole_output(np.random.rand(9, 3) * 10)
-    #print(NN.cache)
-    #NN.back_propagation(, b.T)
-    X,Y = getSamples_array(300)
-    NN = NeuralNetwork(2,[2,2,2],sigmoid,'cross-entropy')
-    # costs = NN.fit(X, Y, 0.01, 0, 0.9995, 1000)
-    # plt.plot(costs,'o-')
-    # plt.show()
-    # NN.set_weights([(np.array([[1, 0.01],[0.01, 1]]), np.array([[0],[0]])),(np.array([[1, -1],[-1, 1]]),np.array([[0.3],[-0.3]]))])
-    NN.predict(X)
-    print(NN.whole_output(X))
-    print(NN.predict(X).any())
-    print(NN.predict(X).all())
-    print(Y.any())
+    # a = np.array([1, 0, 1])
+    # b = np.zeros((3, 2))
+    # b[np.arange(3), a] = 1
+    # #print(NN.cost_function(np.random.rand(9, 3) * 10, b.T))
+    # #print(NN.output_layer_cost_derivative(NN.whole_output(np.random.rand(9, 3) * 10), b.T))
+    # #print()
+    # #NN.whole_output(np.random.rand(9, 3) * 10)
+    # #print(NN.cache)
+    # #NN.back_propagation(, b.T)
+    # X,Y = getSamples_array(300)
+    # NN = NeuralNetwork(2,[2,2,2],sigmoid,'cross-entropy')
+    # # costs = NN.fit(X, Y, 0.01, 0, 0.9995, 1000)
+    # # plt.plot(costs,'o-')
+    # # plt.show()
+    # # NN.set_weights([(np.array([[1, 0.01],[0.01, 1]]), np.array([[0],[0]])),(np.array([[1, -1],[-1, 1]]),np.array([[0.3],[-0.3]]))])
+    # NN.predict(X)
+    # print(NN.whole_output(X))
+    # print(NN.predict(X).any())
+    # print(NN.predict(X).all())
+    # print(Y.any())
