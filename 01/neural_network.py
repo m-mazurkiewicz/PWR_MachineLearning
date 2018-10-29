@@ -95,14 +95,14 @@ class NeuralNetwork:
             # print(self.bias_derivatives[i],self.bias[i])
             self.bias[i] -= learning_rate * self.bias_derivatives[i]
 
-    def fit(self, X, Y, learning_rate, regularisation_lambda, epsilon,max_iteration_number = 10000, min_max_normalization = True):
+    def fit(self, X, Y, learning_rate, regularisation_lambda, epsilon,max_iteration_number = 10000, min_iteration_number = 4, min_max_normalization = True):
         costs = []
         if not self.fitted:
             if min_max_normalization:
                 X = self.min_max_scaler.fit_transform(X)-0.5
             previous_cost_function =  float('inf')
             counter = 0
-            while ((self.cost_function_evaluation(X, Y) / previous_cost_function <= epsilon) and (counter<max_iteration_number)) or (counter<5):
+            while ((self.cost_function_evaluation(X, Y) / previous_cost_function <= epsilon) and (counter<max_iteration_number)) or (counter<min_iteration_number):
                 # print(counter, previous_cost_function)
                 previous_cost_function = self.cost_function_evaluation(X,Y)
                 self.back_propagation(X, Y, regularisation_lambda)
