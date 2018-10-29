@@ -61,9 +61,9 @@ class NeuralNetwork:
     def cost_function_evaluation(self, X, Y, _lambda = 0):
         output = self.whole_output(X)
         if self.cost_function == 'cross-entropy':
-            return np.sum(-np.multiply(Y, np.log(output)) - np.multiply((1 - Y), np.log(1 - output))) / Y.shape[1]
+            return np.sum(-np.multiply(Y, np.log(output)) - np.multiply((1 - Y), np.log(1 - output))) / len(Y)
         elif self.cost_function == 'euclidean_distance':
-            return 1/2 * np.sum(np.power(Y-output,2)) / Y.shape[1]
+            return 1/2 * np.sum(np.power(Y-output,2)) / len(Y)
 
     def output_layer_cost_derivative(self, output_matrix, Y):
         if self.cost_function == 'cross-entropy':

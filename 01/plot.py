@@ -41,15 +41,15 @@ def getSamples(N):
     return samples
 
 
-def getSamples_array(N, balanced = True):
+def getSamples_array(N, balanced = False):
     X = np.random.normal(size=(2, N))
-    Y = np.zeros((2, N), dtype='int')
+    Y = np.zeros((N), dtype='int')
     for i in range(N):
         if (X[0, i] > 0) and (X[1, i] < 0):
         # if X[1, i] > 0:
-            Y[1, i] = 1
-        else:
-            Y[0, i] = 1
+            Y[i] = 1
+        #else:
+        #    Y[0, i] = 1
     if balanced:
         X_extra = np.repeat(X[:,Y[1,:]==1],3,axis=1)
         Y_extra = np.zeros(X_extra.shape, dtype='int')
@@ -84,7 +84,7 @@ def plotSamples_array(X,Y):
     colors = ['red', 'gray']
     for sample in range(X.shape[1]):
         plt.scatter(X[0,sample], X[1,sample],
-                    marker=markers[Y[1,sample]], color=colors[Y[1,sample]],
+                    marker=markers[Y[sample]], color=colors[Y[sample]],
                     alpha=0.5)
 
 def getGrid(view):
