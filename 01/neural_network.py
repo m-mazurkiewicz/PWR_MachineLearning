@@ -22,7 +22,7 @@ class NeuralNetwork:
         self.weights = dict()
         self.bias = dict()
         for i in range(self.number_of_layers):
-            self.weights[i] = np.random.rand(layers_size_vector[i+1],layers_size_vector[i])*2-1
+            self.weights[i] = np.random.rand(layers_size_vector[i+1],layers_size_vector[i])*10
             # self.weights[i] = np.random.rand(layers_size_vector[i+1],layers_size_vector[i])
             # self.weights[i] = np.zeros((layers_size_vector[i+1],layers_size_vector[i]))
             self.bias[i] = np.random.rand(layers_size_vector[i+1],1)*2-1
@@ -71,7 +71,7 @@ class NeuralNetwork:
         elif self.cost_function == 'euclidean_distance':
             return -(Y - output_matrix)
 
-    def back_propagation(self, X, Y, regularisation_lambda):
+    def back_propagation(self, X, Y, regularisation_lambda = 0): #To use regularization we should change backpropagation as well. Dont know if its taken into consideration
         self.cost_derivatives = dict()
         self.weight_derivatives = dict()
         self.bias_derivatives = dict()
@@ -89,19 +89,21 @@ class NeuralNetwork:
             # print(self.bias_derivatives[i],self.bias[i])
             self.bias[i] -= learning_rate * self.bias_derivatives[i]
 
-    def fit(self, X, Y, learning_rate, regularisation_lambda, epsilon,max_iteration_number = 10000, min_max_normalization = True):
+    def fit(self, X, Y, learning_rate, regularisation_lambda, epsilon,max_iteration_number = 10000, min_max_normalization = False):
+        regularisation_lambda = 0
         costs = []
         if not self.fitted:
             if min_max_normalization:
                 X = self.min_max_scaler.fit_transform(X)-0.5
-            previous_cost_function =  float('inf')
+            previous_cost_function = float('inf')
             counter = 0
-            while ((self.cost_function_evaluation(X, Y) / previous_cost_function <= epsilon) and (counter<max_iteration_number)) or (counter<5):
+            #while ((self.cost_function_evaluation(X, Y) / previous_cost_function <= epsilon) and (counter<max_iteration_number)) or (counter<5):
+            for i in range(max_iteration_number):
                 # print(counter, previous_cost_function)
                 previous_cost_function = self.cost_function_evaluation(X,Y)
                 self.back_propagation(X, Y, regularisation_lambda)
                 self.update_weights(learning_rate)
-                counter +=1
+                #counter +=1
                 # print(counter, self.cost_function(X,Y)/previous_cost_function)
                 costs.append(self.cost_function_evaluation(X,Y))
             self.fitted = True
@@ -109,10 +111,10 @@ class NeuralNetwork:
         else:
             raise Exception("Neural network already fitted!")
 
-    def set_weights(self, list_of_parameters):
-        for layer_no, parameters in enumerate(list_of_parameters):
-            self.weights[layer_no] = parameters[0]
-            self.bias[layer_no] = parameters[1]
+    # def set_weights(self, list_of_parameters):
+    #     for layer_no, parameters in enumerate(list_of_parameters):
+    #         self.weights[layer_no] = parameters[0]
+    #         self.bias[layer_no] = parameters[1]
 
 
 def ReLU(x, grad = False):
@@ -129,12 +131,10 @@ def sigmoid(x, grad = False):
 
 def getSamples_array(N):
     X = np.random.normal(size=(2, N))
-    Y = np.zeros((2, N))
+    Y = np.zeros((N,1))#, dtype='int')
     for i in range(N):
         if (X[0, i] > 0) and (X[1, i] < 0):
-            Y[1, i] = 1
-        else:
-            Y[0, i] = 1
+            Y[i] = 1
     return X,Y
 
 if __name__ == '__main__':
@@ -154,9 +154,9 @@ if __name__ == '__main__':
     # costs = NN.fit(X, Y, 0.01, 0, 0.9995, 1000)
     # plt.plot(costs,'o-')
     # plt.show()
-    NN.set_weights([(np.array([[1, 0.01],[0.01, 1]]), np.array([[0],[0]])),(np.array([[1, -1],[-1, 1]]),np.array([[0.3],[-0.3]]))])
+    # NN.set_weights([(np.array([[1, 0.01],[0.01, 1]]), np.array([[0],[0]])),(np.array([[1, -1],[-1, 1]]),np.array([[0.3],[-0.3]]))])
     NN.predict(X)
-    # print(NN.whole_output(X))
-    # print(NN.predict(X).any())
-    # print(NN.predict(X).all())
-    # print(Y[1,:].any())
+    print(NN.whole_output(X))
+    print(NN.predict(X).any())
+    print(NN.predict(X).all())
+    print(Y.any())
