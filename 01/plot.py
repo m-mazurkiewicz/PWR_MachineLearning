@@ -65,10 +65,10 @@ def getSamples(N):
 
 def getSamples_array(N):
     X = np.random.normal(size=(2, N))
-    Y = np.zeros((N, 1), dtype='int')
+    Y = np.zeros((1, N), dtype='int')
     for i in range(N):
         if (X[0, i] > 0) and (X[1, i] < 0):
-            Y[i] = 1
+            Y[0,i] = 1
     return X,Y
 
 
@@ -119,20 +119,20 @@ X,Y = getSamples_array(numberOfSamples)
 # NN.set_weights([(np.array([[1., 0.01],[0.01, 1.]]), np.array([[0.],[0.]])),(np.array([[1., -1.],[-1., 1.]]),np.array([[0.3],[-0.3]]))])
 # costs = NN.fit(X, Y, 0.001, 1, 0.9999, 10000)
 NN = NeuralNetwork([2, 20, 3, 1], sigmoid, 'cross-entropy')
-costs = NN.fit(X, Y.T, 0.3, 0, 0.9995, 30000, min_max_normalization=False)
+costs = NN.fit(X, Y, 0.3, 0, 0.9995, 30000, min_max_normalization=False)
 plt.plot(costs,'o-')
 plt.show()
 # NN = NeuralNetwork(2, [2, 2, 2], sigmoid)
 # NN.set_weights([(np.array([[1, 0.01],[0.01, 1]]), np.array([[0],[0]])),(np.array([[1, -1],[-1, 1]]),np.array([[0.3],[-0.3]]))])
 plotDecisionDomain_our(getGrid(viewX), getGrid(viewY), getDecisionOfFakeNeuralNet_our, NN.predict)
-plotSamples_array(X,Y.T)
+plotSamples_array(X,Y)
 plt.show()
 # print(Y.shape, NN.predict(X).shape)
 # print(np.array(Y, dtype=bool))
 # predict = (NN.predict(X)-1)*(-1)
 predict = NN.predict(X)
-print(len(np.where(predict & np.array(Y.T, dtype=bool))[0]))
-print(numberOfSamples-len(np.where(predict | np.array(Y.T, dtype=bool))[0]))
+print(len(np.where(predict & np.array(Y, dtype=bool))[0]))
+print(numberOfSamples-len(np.where(predict | np.array(Y, dtype=bool))[0]))
 # print(confusion_matrix(np.array(Y, dtype=bool),NN.predict(X)))
 
 # samples = getSamples(numberOfSamples)
