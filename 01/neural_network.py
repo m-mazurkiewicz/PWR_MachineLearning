@@ -76,21 +76,17 @@ class NeuralNetwork:
         self.cost_derivatives = dict()
         self.weight_derivatives = dict()
         self.bias_derivatives = dict()
-        # self.cost_derivatives[self.number_of_layers - 1] = self.output_layer_cost_derivative(self.whole_output(X), Y)
         dZ = self.output_layer_cost_derivative(self.whole_output(X), Y)
-        # print(dZ.shape)
         for i in reversed(range(1,self.number_of_layers)):
-            # self.weight_derivatives[i] = (np.dot(dZ, self.cache_A[i-1].T) ) / X.shape[1]# + regularisation_lambda * self.weights[i] / X.shape[1]
-            self.weight_derivatives[i] = (np.dot(dZ, self.cache_A[i-1].T) + regularisation_lambda * self.weights[i]) / X.shape[1]# + regularisation_lambda * self.weights[i] / X.shape[1]
+            self.weight_derivatives[i] = (np.dot(dZ, self.cache_A[i-1].T) + regularisation_lambda * self.weights[i]) / X.shape[1]
             self.bias_derivatives[i] = np.sum(dZ, axis=1, keepdims=True) / X.shape[1]
             self.cost_derivatives[i - 1] = np.dot(self.weights[i].T, dZ)
             if i!=1:
-                dZ = self.cost_derivatives[i-1] * ReLU(self.cache_A[i-1], grad=True)#self.activation_function[i](self.cache[i][1], grad = True)
+                dZ = self.cost_derivatives[i-1] * ReLU(self.cache_A[i-1], grad=True)
 
     def update_weights(self, learning_rate):
         for i in range(1,self.number_of_layers):
             self.weights[i] -= learning_rate * self.weight_derivatives[i]
-            # print(self.bias_derivatives[i],self.bias[i])
             self.bias[i] -= learning_rate * self.bias_derivatives[i]
 
     def fit(self, X, Y, learning_rate, regularisation_lambda, epsilon,max_iteration_number = 10000, min_iteration_number = 4, min_max_normalization = True):
@@ -101,14 +97,11 @@ class NeuralNetwork:
             previous_cost_function =  float('inf')
             counter = 0
             while ((self.cost_function_evaluation(X, Y) / previous_cost_function <= epsilon) and (counter<max_iteration_number)) or (counter<min_iteration_number):
-            # while counter<max_iteration_number:
-                # print(counter, previous_cost_function)
                 previous_cost_function = self.cost_function_evaluation(X,Y)
                 self.whole_output(X)
                 self.back_propagation(X, Y, regularisation_lambda)
                 self.update_weights(learning_rate)
                 counter +=1
-                # print(counter, self.cost_function(X,Y)/previous_cost_function)
                 costs.append(self.cost_function_evaluation(X,Y))
             self.fitted = True
             return costs
@@ -124,8 +117,7 @@ class NeuralNetwork:
 def ReLU(x, grad = False):
     if grad == True:
         return np.int64(x > 0)
-    # return x * (x > 0)
-    return np.maximum(0,x)
+    return x * (x > 0)
 
 
 def sigmoid(x, grad = False):
