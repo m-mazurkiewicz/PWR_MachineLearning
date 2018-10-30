@@ -11,7 +11,7 @@ class NeuralNetwork:
     min_max_scaler = preprocessing.MinMaxScaler()
 
     def __init__(self, layers_size_vector, activation_function, cost_function = 'cross-entropy'):
-        self.number_of_layers = len(layers_size_vector) - 1
+        self.number_of_layers = len(layers_size_vector)
         if type(activation_function) is list:
             self.activation_function = activation_function
         else:
@@ -25,11 +25,12 @@ class NeuralNetwork:
     def initialise_parameters(self, layers_size_vector):
         self.weights = dict()
         self.bias = dict()
-        for i in range(self.number_of_layers):
+        for i in range(1, self.number_of_layers):
             # self.weights[i] = np.random.rand(layers_size_vector[i+1],layers_size_vector[i])*2-1
-            self.weights[i] = np.random.rand(layers_size_vector[i+1],layers_size_vector[i])
+            self.weights[i] = np.random.randn(layers_size_vector[i],layers_size_vector[i-1]) / np.sqrt(layers_size_vector[i-1])
             # self.weights[i] = np.zeros((layers_size_vector[i+1],layers_size_vector[i]))
-            self.bias[i] = np.random.rand(layers_size_vector[i+1],1)
+            # self.bias[i] = np.random.rand(layers_size_vector[i+1],1)
+            self.bias[i] = np.zeros((layers_size_vector[i],1))
 
     # def single_output(self, input_vector):
     #     input_vector = np.vstack([1,input_vector])
@@ -47,14 +48,24 @@ class NeuralNetwork:
     def whole_output(self, A):
         # number_of_training_examples = input_matrix.shape[1]
         # A = np.vstack([[1] * number_of_training_examples, input_matrix])
-        for i in range(self.number_of_layers-1):
-            Z = self.linear_forward(A, i)
-            self.cache.append((A, Z))
-            A = ReLU(Z)
-        Z = self.linear_forward(A,self.number_of_layers-1)
-        self.cache.append((A,Z))
-        A = sigmoid(Z)
-        return A
+        # for i in range(self.number_of_layers-1):
+        #     Z = self.linear_forward(A, i)
+        #     self.cache.append((A, Z))
+        #     A = ReLU(Z)
+        # Z = self.linear_forward(A,self.number_of_layers-1)
+        # self.cache.append((A,Z))
+        # A = sigmoid(Z)
+
+        # LINEAR -> RELU -> LINEAR -> RELU -> LINEAR -> SIGMOID
+        Z1 = np.dot(self.weights[1], A) + self.bias[1]
+        A1 = ReLU(Z1)
+        Z2 = np.dot(self.weights[2], A1) + self.bias[2]
+        A2 = ReLU(Z2)
+        Z3 = np.dot(self.weights[3], A2) + self.bias[3]
+        A3 = sigmoid(Z3)
+
+        self.cache = (Z1, A1, self.weights[1], self.bias[1], Z2, A2, self.weights[2], self.bias[2], Z3, A3, self.weights[3], self.bias[3])
+        return A3
 
     def linear_forward(self, previous_A, layer_no):
         # print(np.dot(self.weights[layer_no], previous_A).shape,self.bias[layer_no].shape)
@@ -74,7 +85,7 @@ class NeuralNetwork:
     def cost_function_evaluation(self, X, Y, _lambda = 0):
         output = self.whole_output(X)
         if self.cost_function == 'cross-entropy':
-            return np.sum(-np.multiply(Y, np.log(output)) - np.multiply((1 - Y), np.log(1 - output))) / Y.shape[1]
+            return np.nansum(-np.multiply(Y, np.log(output)) - np.multiply((1 - Y), np.log(1 - output))) / Y.shape[1]
         elif self.cost_function == 'euclidean_distance':
             return 1/2 * np.sum(np.power(Y-output,2)) / Y.shape[1]
 
@@ -86,20 +97,46 @@ class NeuralNetwork:
         #     return -(Y - output_matrix)
 
     def back_propagation(self, X, Y, regularisation_lambda = 0):
-        self.cost_derivatives = dict()
+        # self.cost_derivatives = dict()
         self.weight_derivatives = dict()
         self.bias_derivatives = dict()
-        self.cost_derivatives[self.number_of_layers - 1] = self.output_layer_cost_derivative(self.whole_output(X), Y)
-        dZ = self.cost_derivatives[self.number_of_layers - 1]
-        for i in reversed(range(self.number_of_layers)):
-            self.weight_derivatives[i] = (np.dot(dZ, self.cache[i][0].T) + regularisation_lambda * self.weights[i]) / X.shape[1]
-            # self.bias_derivatives[i] = np.squeeze(np.sum(dZ, axis=1, keepdims=True)) / X.shape[1]
-            self.bias_derivatives[i] = np.sum(dZ, axis=1, keepdims=True) / X.shape[1]
-            self.cost_derivatives[i - 1] = np.dot(self.weights[i].T, dZ)
-            dZ = self.cost_derivatives[i-1] * ReLU(self.cache[i][0])#self.activation_function[i](self.cache[i][1], grad = True)
+        # self.cost_derivatives[self.number_of_layers - 1] = self.output_layer_cost_derivative(self.whole_output(X), Y)
+        # dZ = self.cost_derivatives[self.number_of_layers - 1]
+        # for i in reversed(range(self.number_of_layers)):
+        #     self.weight_derivatives[i] = (np.dot(dZ, self.cache[i][0].T) + regularisation_lambda * self.weights[i]) / X.shape[1]
+        #     # self.bias_derivatives[i] = np.squeeze(np.sum(dZ, axis=1, keepdims=True)) / X.shape[1]
+        #     self.bias_derivatives[i] = np.sum(dZ, axis=1, keepdims=True) / X.shape[1]
+        #     self.cost_derivatives[i - 1] = np.dot(self.weights[i].T, dZ)
+        #     dZ = self.cost_derivatives[i-1] * ReLU(self.cache[i][0])#self.activation_function[i](self.cache[i][1], grad = True)
+        m = X.shape[1]
+        (Z1, A1, W1, b1, Z2, A2, W2, b2, Z3, A3, W3, b3) = self.cache
+
+        dZ3 = A3 - Y
+        dW3 = 1. / m * np.dot(dZ3, A2.T)
+        db3 = 1. / m * np.sum(dZ3, axis=1, keepdims=True)
+
+        dA2 = np.dot(W3.T, dZ3)
+        dZ2 = np.multiply(dA2, np.int64(A2 > 0))
+        dW2 = 1. / m * np.dot(dZ2, A1.T)
+        db2 = 1. / m * np.sum(dZ2, axis=1, keepdims=True)
+
+        dA1 = np.dot(W2.T, dZ2)
+        dZ1 = np.multiply(dA1, np.int64(A1 > 0))
+        dW1 = 1. / m * np.dot(dZ1, X.T)
+        db1 = 1. / m * np.sum(dZ1, axis=1, keepdims=True)
+
+        # gradients = {"dZ3": dZ3, "dW3": dW3, "db3": db3,
+        #              "dA2": dA2, "dZ2": dZ2, "dW2": dW2, "db2": db2,
+        #              "dA1": dA1, "dZ1": dZ1, "dW1": dW1, "db1": db1}
+        self.weight_derivatives[1] = dW1
+        self.bias_derivatives[1] = db1
+        self.weight_derivatives[2] = dW2
+        self.bias_derivatives[2] = db2
+        self.weight_derivatives[3] = dW3
+        self.bias_derivatives[3] = db3
 
     def update_weights(self, learning_rate):
-        for i in range(self.number_of_layers):
+        for i in range(1,self.number_of_layers):
             self.weights[i] -= learning_rate * self.weight_derivatives[i]
             # print(self.bias_derivatives[i],self.bias[i])
             self.bias[i] -= learning_rate * self.bias_derivatives[i]
@@ -111,9 +148,11 @@ class NeuralNetwork:
                 X = self.min_max_scaler.fit_transform(X)-0.5
             previous_cost_function =  float('inf')
             counter = 0
-            while ((self.cost_function_evaluation(X, Y) / previous_cost_function <= epsilon) and (counter<max_iteration_number)) or (counter<min_iteration_number):
+            # while ((self.cost_function_evaluation(X, Y) / previous_cost_function <= epsilon) and (counter<max_iteration_number)) or (counter<min_iteration_number):
+            while counter<max_iteration_number:
                 # print(counter, previous_cost_function)
                 previous_cost_function = self.cost_function_evaluation(X,Y)
+                self.whole_output(X)
                 self.back_propagation(X, Y, regularisation_lambda)
                 self.update_weights(learning_rate)
                 counter +=1
@@ -132,8 +171,9 @@ class NeuralNetwork:
 
 def ReLU(x, grad = False):
     if grad == True:
-        return x>0
-    return x * (x > 0)
+        return np.int64(x > 0)
+    # return x * (x > 0)
+    return np.maximum(0,x)
 
 
 def sigmoid(x, grad = False):
@@ -157,10 +197,10 @@ def softmax(x, grad = False):
 
 def getSamples_array(N):
     X = np.random.normal(size=(2, N))
-    Y = np.zeros((1, N))
+    Y = np.zeros((N,1))
     for i in range(N):
         if (X[0, i] > 0) and (X[1, i] < 0):
-            Y[:,i] = 1
+            Y[i] = 1
     return X,Y
 
 if __name__ == '__main__':
@@ -176,8 +216,8 @@ if __name__ == '__main__':
     #print(NN.cache)
     #NN.back_propagation(, b.T)
     X,Y = getSamples_array(300)
-    NN = NeuralNetwork([2,3,1],[sigmoid, softmax],'cross-entropy')
-    costs = NN.fit(X, Y, 0.001, 0, 0.9995, 1000)
+    NN = NeuralNetwork([2,20,3,1],[sigmoid, softmax],'cross-entropy')
+    costs = NN.fit(X, Y.T, 0.3, 0, 0.9995, 30000)
     plt.plot(costs,'o-')
     plt.show()
     # print(NN.whole_output(X))
