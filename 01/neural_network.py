@@ -114,39 +114,6 @@ class NeuralNetwork:
             self.cost_derivatives[i - 1] = np.dot(self.weights[i].T, dZ)
             if i!=1:
                 dZ = self.cost_derivatives[i-1] * ReLU(self.cache_A[i-1], grad=True)#self.activation_function[i](self.cache[i][1], grad = True)
-        # m = X.shape[1]
-        # container = []
-        # for i in range(1,self.number_of_layers):
-        #     container.append(self.cache_Z[i])
-        #     container.append(self.cache_A[i])
-        #     container.append(self.weights[i])
-        #     container.append(self.bias[i])
-        # # (Z1, A1, W1, b1, Z2, A2, W2, b2, Z3, A3, W3, b3) = self.cache
-        # (Z1, A1, W1, b1, Z2, A2, W2, b2, Z3, A3, W3, b3) = container
-        #
-        # dZ3 = A3 - Y
-        # dW3 = 1. / m * np.dot(dZ3, A2.T)
-        # db3 = 1. / m * np.sum(dZ3, axis=1, keepdims=True)
-        #
-        # dA2 = np.dot(W3.T, dZ3)
-        # dZ2 = np.multiply(dA2, np.int64(A2 > 0))
-        # dW2 = 1. / m * np.dot(dZ2, A1.T)
-        # db2 = 1. / m * np.sum(dZ2, axis=1, keepdims=True)
-        #
-        # dA1 = np.dot(W2.T, dZ2)
-        # dZ1 = np.multiply(dA1, np.int64(A1 > 0))
-        # dW1 = 1. / m * np.dot(dZ1, X.T)
-        # db1 = 1. / m * np.sum(dZ1, axis=1, keepdims=True)
-        #
-        # # gradients = {"dZ3": dZ3, "dW3": dW3, "db3": db3,
-        # #              "dA2": dA2, "dZ2": dZ2, "dW2": dW2, "db2": db2,
-        # #              "dA1": dA1, "dZ1": dZ1, "dW1": dW1, "db1": db1}
-        # self.weight_derivatives[1] = dW1
-        # self.bias_derivatives[1] = db1
-        # self.weight_derivatives[2] = dW2
-        # self.bias_derivatives[2] = db2
-        # self.weight_derivatives[3] = dW3
-        # self.bias_derivatives[3] = db3
 
     def update_weights(self, learning_rate):
         for i in range(1,self.number_of_layers):
@@ -161,8 +128,8 @@ class NeuralNetwork:
                 X = self.min_max_scaler.fit_transform(X)-0.5
             previous_cost_function =  float('inf')
             counter = 0
-            # while ((self.cost_function_evaluation(X, Y) / previous_cost_function <= epsilon) and (counter<max_iteration_number)) or (counter<min_iteration_number):
-            while counter<max_iteration_number:
+            while ((self.cost_function_evaluation(X, Y) / previous_cost_function <= epsilon) and (counter<max_iteration_number)) or (counter<min_iteration_number):
+            # while counter<max_iteration_number:
                 # print(counter, previous_cost_function)
                 previous_cost_function = self.cost_function_evaluation(X,Y)
                 self.whole_output(X)
