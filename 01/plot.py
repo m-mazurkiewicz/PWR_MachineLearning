@@ -104,7 +104,7 @@ def getGrid(view):
     return [view[0] + (view[1] - view[0]) * i / (view[2] - 1) for i in range(view[2])]
 
 
-numberOfSamples = 100
+numberOfSamples = 1000
 
 viewX = [-4, 4, 101]
 viewY = [-4, 4, 101]
@@ -118,8 +118,8 @@ X,Y = getSamples_array(numberOfSamples)
 # NN = NeuralNetwork(2, [2,2,2], sigmoid, 'euclidean_distance')
 # NN.set_weights([(np.array([[1., 0.01],[0.01, 1.]]), np.array([[0.],[0.]])),(np.array([[1., -1.],[-1., 1.]]),np.array([[0.3],[-0.3]]))])
 # costs = NN.fit(X, Y, 0.001, 1, 0.9999, 10000)
-NN = NeuralNetwork([2, 20, 3, 1], sigmoid, 'cross-entropy')
-costs = NN.fit(X, Y, 0.3, 0, 0.9995, 30000, min_max_normalization=False)
+NN = NeuralNetwork([2, 20, 3, 1], [ReLU, ReLU, sigmoid], 'euclidean_distance')
+costs = NN.fit(X, Y, 0.3, 0, 0.9995, 10000, min_max_normalization=False)
 plt.plot(costs,'o-')
 plt.show()
 # NN = NeuralNetwork(2, [2, 2, 2], sigmoid)
