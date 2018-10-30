@@ -131,8 +131,6 @@ def softmax(x, grad = False):
     def softmax_eval(x):
         e_x = np_autograd.exp(x - np_autograd.max(x))
         return e_x / e_x.sum(axis=0)
-        # y = np_autograd.exp(-2.0 * x)
-        # return (1.0 - y) / (1.0 + y)
     softmax_eval_grad = egrad(softmax_eval)
     if grad:
         return softmax_eval_grad(x)
