@@ -13,6 +13,8 @@ class NeuralNetwork:
     def __init__(self, layers_size_vector, activation_function, cost_function = 'cross-entropy'):
         self.number_of_layers = len(layers_size_vector)
         if type(activation_function) is list:
+            if self.number_of_layers != len(activation_function) + 1:
+                raise Exception("layer_size_vector & activation_function dimension mismatch")
             self.activation_function = activation_function
         else:
             self.activation_function = [activation_function] * self.number_of_layers
@@ -33,15 +35,11 @@ class NeuralNetwork:
         self.cache_A = dict()
         self.cache_Z = dict()
         self.cache_A[0] = A
-        for i in range(1,self.number_of_layers-1):
+        for i in range(1,self.number_of_layers):
             Z = self.linear_forward(A, i)
-            A = ReLU(Z)
+            A = self.activation_function[i-1](Z)
             self.cache_A[i] = A
             self.cache_Z[i] = Z
-        Z = self.linear_forward(A,self.number_of_layers-1)
-        A = sigmoid(Z)
-        self.cache_A[self.number_of_layers-1] = A
-        self.cache_Z[self.number_of_layers-1] = Z
         return A
 
     def linear_forward(self, previous_A, layer_no):
@@ -79,7 +77,7 @@ class NeuralNetwork:
             self.bias_derivatives[i] = np.sum(dZ, axis=1, keepdims=True) / X.shape[1]
             self.cost_derivatives[i - 1] = np.dot(self.weights[i].T, dZ)
             if i!=1:
-                dZ = self.cost_derivatives[i-1] * ReLU(self.cache_A[i-1], grad=True)
+                dZ = self.cost_derivatives[i-1] * self.activation_function[i-1](self.cache_A[i-1], grad=True)
 
     def update_weights(self, learning_rate):
         for i in range(1,self.number_of_layers):
