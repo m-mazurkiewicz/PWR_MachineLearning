@@ -217,7 +217,7 @@ if __name__ == '__main__':
     #NN.back_propagation(, b.T)
     X,Y = getSamples_array(300)
     NN = NeuralNetwork([2,20,3,1],[sigmoid, softmax],'cross-entropy')
-    costs = NN.fit(X, Y.T, 0.3, 0, 0.9995, 30000)
+    costs = NN.fit(X, Y.T, 0.3, 0, 0.9995, 30000, min_max_normalization=False)
     plt.plot(costs,'o-')
     plt.show()
     # print(NN.whole_output(X))
