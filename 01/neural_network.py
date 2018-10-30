@@ -69,9 +69,7 @@ class NeuralNetwork:
         # else:
         #     # print(output)
         #     return np.argmax(output, axis=0)
-        o = output > 0.5
-        o = o[:, np.newaxis]
-        return o.T
+        return output > 0.5
 
     def cost_function_evaluation(self, X, Y, _lambda = 0):
         output = self.whole_output(X)
