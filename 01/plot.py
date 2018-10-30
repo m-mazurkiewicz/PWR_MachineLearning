@@ -25,7 +25,7 @@ def getDecisionOfFakeNeuralNet(x, y):
 
 
 def getDecisionOfFakeNeuralNet_our(x, y, output_function):
-    output = output_function(np.array([[x, y]]).T).flatten().tolist()
+    output = output_function(np.array([[y, x]]).T).flatten().tolist()
     # print(output)
     # print(np.abs(output[1]-output[0]))
     # return 1 if output[1] > output[0] else 0
@@ -33,7 +33,8 @@ def getDecisionOfFakeNeuralNet_our(x, y, output_function):
     #     print("Yay!")
     #     return 1
     # print(output[0])
-    return output[0]
+    # print(int(output[0]))
+    return int(output[0])
 
 def getSamples(N):
     samples = []
@@ -126,8 +127,13 @@ plt.show()
 plotDecisionDomain_our(getGrid(viewX), getGrid(viewY), getDecisionOfFakeNeuralNet_our, NN.predict)
 plotSamples_array(X,Y)
 plt.show()
-print(Y.shape, NN.predict(X).shape)
-print(confusion_matrix(Y,NN.predict(X)))
+# print(Y.shape, NN.predict(X).shape)
+# print(np.array(Y, dtype=bool))
+# predict = (NN.predict(X)-1)*(-1)
+predict = NN.predict(X)
+print(len(np.where(predict & np.array(Y, dtype=bool))[0]))
+print(numberOfSamples-len(np.where(predict | np.array(Y, dtype=bool))[0]))
+# print(confusion_matrix(np.array(Y, dtype=bool),NN.predict(X)))
 
 # samples = getSamples(numberOfSamples)
 # plotDecisionDomain(getGrid(viewX), getGrid(viewY), getDecisionOfFakeNeuralNet)
