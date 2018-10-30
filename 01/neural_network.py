@@ -26,10 +26,7 @@ class NeuralNetwork:
         self.weights = dict()
         self.bias = dict()
         for i in range(1, self.number_of_layers):
-            # self.weights[i] = np.random.rand(layers_size_vector[i+1],layers_size_vector[i])*2-1
-            self.weights[i] = np.random.randn(layers_size_vector[i],layers_size_vector[i-1]) / np.sqrt(layers_size_vector[i-1])
-            # self.weights[i] = np.zeros((layers_size_vector[i+1],layers_size_vector[i]))
-            # self.bias[i] = np.random.rand(layers_size_vector[i+1],1)
+            self.weights[i] = np.random.randn(layers_size_vector[i],layers_size_vector[i-1]) * np.sqrt(2/layers_size_vector[i-1])  #He initialisation
             self.bias[i] = np.zeros((layers_size_vector[i],1))
 
     def whole_output(self, A):
