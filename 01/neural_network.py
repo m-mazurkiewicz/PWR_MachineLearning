@@ -109,7 +109,8 @@ class NeuralNetwork:
         dZ = self.output_layer_cost_derivative(self.whole_output(X), Y)
         # print(dZ.shape)
         for i in reversed(range(1,self.number_of_layers)):
-            self.weight_derivatives[i] = (np.dot(dZ, self.cache_A[i-1].T)) / X.shape[1]# + regularisation_lambda * self.weights[i] / X.shape[1]
+            # self.weight_derivatives[i] = (np.dot(dZ, self.cache_A[i-1].T) ) / X.shape[1]# + regularisation_lambda * self.weights[i] / X.shape[1]
+            self.weight_derivatives[i] = (np.dot(dZ, self.cache_A[i-1].T) + regularisation_lambda * self.weights[i]) / X.shape[1]# + regularisation_lambda * self.weights[i] / X.shape[1]
             self.bias_derivatives[i] = np.sum(dZ, axis=1, keepdims=True) / X.shape[1]
             self.cost_derivatives[i - 1] = np.dot(self.weights[i].T, dZ)
             if i!=1:
