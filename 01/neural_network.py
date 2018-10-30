@@ -32,22 +32,7 @@ class NeuralNetwork:
             # self.bias[i] = np.random.rand(layers_size_vector[i+1],1)
             self.bias[i] = np.zeros((layers_size_vector[i],1))
 
-    # def single_output(self, input_vector):
-    #     input_vector = np.vstack([1,input_vector])
-    #     # print(input_vector)
-    #     if len(input_vector) != self.layers_size_vector[0]:
-    #         raise ValueError('Dimensions mismatch!')
-    #     A = input_vector
-    #     for i in range(self.number_of_layers):
-    #         # print(A)
-    #         # print(self.weights[1].shape, A.shape)
-    #         #A = self.activation_function(np.dot(self.weights[i], A))# + self.bias[i])
-    #         A,_ = self.linear_forward(A, i)
-    #     return A.flatten().tolist()
-
     def whole_output(self, A):
-        # number_of_training_examples = input_matrix.shape[1]
-        # A = np.vstack([[1] * number_of_training_examples, input_matrix])
         self.cache_A = dict()
         self.cache_Z = dict()
         self.cache_A[0] = A
@@ -60,32 +45,20 @@ class NeuralNetwork:
         A = sigmoid(Z)
         self.cache_A[self.number_of_layers-1] = A
         self.cache_Z[self.number_of_layers-1] = Z
-
-        # LINEAR -> RELU -> LINEAR -> RELU -> LINEAR -> SIGMOID
-        # Z1 = np.dot(self.weights[1], A) + self.bias[1]
-        # A1 = ReLU(Z1)
-        # Z2 = np.dot(self.weights[2], A1) + self.bias[2]
-        # A2 = ReLU(Z2)
-        # Z3 = np.dot(self.weights[3], A2) + self.bias[3]
-        # A3 = sigmoid(Z3)
-        #
-        # self.cache = (Z1, A1, self.weights[1], self.bias[1], Z2, A2, self.weights[2], self.bias[2], Z3, A3, self.weights[3], self.bias[3])
         return A
 
     def linear_forward(self, previous_A, layer_no):
-        # print(np.dot(self.weights[layer_no], previous_A).shape,self.bias[layer_no].shape)
         return np.dot(self.weights[layer_no], previous_A)+self.bias[layer_no]
 
     def predict(self,input_matrix):
         output = self.whole_output(input_matrix)
-        # if input_matrix.shape[0] == 1:
-        #     o = output > 0.5
-        #     o = o[:,np.newaxis]
-        #     return o.T
-        # else:
-        #     # print(output)
-        #     return np.argmax(output, axis=0)
-        return output > 0.5
+        if output.shape[0] == 1:
+            o = output > 0.5
+            o = o[:,np.newaxis]
+            return o
+        else:
+            # print(output)
+            return np.argmax(output, axis=0)
 
     def cost_function_evaluation(self, X, Y, _lambda = 0):
         output = self.whole_output(X)
