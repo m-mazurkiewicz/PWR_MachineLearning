@@ -57,7 +57,6 @@ class NeuralNetwork:
             o = o[:,np.newaxis]
             return o
         else:
-            # print(output)
             return np.argmax(output, axis=0)
 
     def cost_function_evaluation(self, X, Y, _lambda = 0):
@@ -68,11 +67,10 @@ class NeuralNetwork:
             return 1/2 * np.sum(np.power(Y-output,2)) / Y.shape[1]
 
     def output_layer_cost_derivative(self, output_matrix, Y):
-        return -(Y - output_matrix)
-        # if self.cost_function == 'cross-entropy':
-        #     return - (np.divide(Y, output_matrix) - np.divide(1 - Y, 1 - output_matrix))
-        # elif self.cost_function == 'euclidean_distance':
-        #     return -(Y - output_matrix)
+        if self.cost_function == 'cross-entropy':
+            return - (np.divide(Y, output_matrix) - np.divide(1 - Y, 1 - output_matrix))
+        elif self.cost_function == 'euclidean_distance':
+            return -(Y - output_matrix)
 
     def back_propagation(self, X, Y, regularisation_lambda = 0):
         self.cost_derivatives = dict()
