@@ -48,24 +48,28 @@ class NeuralNetwork:
     def whole_output(self, A):
         # number_of_training_examples = input_matrix.shape[1]
         # A = np.vstack([[1] * number_of_training_examples, input_matrix])
-        # for i in range(self.number_of_layers-1):
-        #     Z = self.linear_forward(A, i)
-        #     self.cache.append((A, Z))
-        #     A = ReLU(Z)
-        # Z = self.linear_forward(A,self.number_of_layers-1)
-        # self.cache.append((A,Z))
-        # A = sigmoid(Z)
+        self.cache_A = dict()
+        self.cache_Z = dict()
+        for i in range(1,self.number_of_layers-1):
+            Z = self.linear_forward(A, i)
+            A = ReLU(Z)
+            self.cache_A[i] = A
+            self.cache_Z[i] = Z
+        Z = self.linear_forward(A,self.number_of_layers-1)
+        A = sigmoid(Z)
+        self.cache_A[self.number_of_layers-1] = A
+        self.cache_Z[self.number_of_layers-1] = Z
 
         # LINEAR -> RELU -> LINEAR -> RELU -> LINEAR -> SIGMOID
-        Z1 = np.dot(self.weights[1], A) + self.bias[1]
-        A1 = ReLU(Z1)
-        Z2 = np.dot(self.weights[2], A1) + self.bias[2]
-        A2 = ReLU(Z2)
-        Z3 = np.dot(self.weights[3], A2) + self.bias[3]
-        A3 = sigmoid(Z3)
-
-        self.cache = (Z1, A1, self.weights[1], self.bias[1], Z2, A2, self.weights[2], self.bias[2], Z3, A3, self.weights[3], self.bias[3])
-        return A3
+        # Z1 = np.dot(self.weights[1], A) + self.bias[1]
+        # A1 = ReLU(Z1)
+        # Z2 = np.dot(self.weights[2], A1) + self.bias[2]
+        # A2 = ReLU(Z2)
+        # Z3 = np.dot(self.weights[3], A2) + self.bias[3]
+        # A3 = sigmoid(Z3)
+        #
+        # self.cache = (Z1, A1, self.weights[1], self.bias[1], Z2, A2, self.weights[2], self.bias[2], Z3, A3, self.weights[3], self.bias[3])
+        return A
 
     def linear_forward(self, previous_A, layer_no):
         # print(np.dot(self.weights[layer_no], previous_A).shape,self.bias[layer_no].shape)
@@ -109,7 +113,14 @@ class NeuralNetwork:
         #     self.cost_derivatives[i - 1] = np.dot(self.weights[i].T, dZ)
         #     dZ = self.cost_derivatives[i-1] * ReLU(self.cache[i][0])#self.activation_function[i](self.cache[i][1], grad = True)
         m = X.shape[1]
-        (Z1, A1, W1, b1, Z2, A2, W2, b2, Z3, A3, W3, b3) = self.cache
+        container = []
+        for i in range(1,self.number_of_layers):
+            container.append(self.cache_Z[i])
+            container.append(self.cache_A[i])
+            container.append(self.weights[i])
+            container.append(self.bias[i])
+        # (Z1, A1, W1, b1, Z2, A2, W2, b2, Z3, A3, W3, b3) = self.cache
+        (Z1, A1, W1, b1, Z2, A2, W2, b2, Z3, A3, W3, b3) = container
 
         dZ3 = A3 - Y
         dW3 = 1. / m * np.dot(dZ3, A2.T)
