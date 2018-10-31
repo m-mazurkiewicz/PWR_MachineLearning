@@ -4,6 +4,7 @@ from matplotlib import pyplot as plt
 import autograd.numpy as np_autograd
 from autograd import jacobian, grad
 from autograd import elementwise_grad as egrad
+from copy import deepcopy
 
 
 class NeuralNetwork:
@@ -28,19 +29,20 @@ class NeuralNetwork:
         self.weights = dict()
         self.bias = dict()
         for i in range(1, self.number_of_layers):
-            self.weights[i] = np.random.randn(layers_size_vector[i],layers_size_vector[i-1]) * np.sqrt(2/layers_size_vector[i-1])  #He initialisation
+            # self.weights[i] = np.random.randn(layers_size_vector[i],layers_size_vector[i-1]) * np.sqrt(2/layers_size_vector[i-1])  #He initialisation
+            self.weights[i] = np.random.randn(layers_size_vector[i],layers_size_vector[i-1]) / np.sqrt(layers_size_vector[i-1])
             self.bias[i] = np.zeros((layers_size_vector[i],1))
 
     def whole_output(self, A):
         self.cache_A = dict()
         self.cache_Z = dict()
-        self.cache_A[0] = A
+        self.cache_A[0] = deepcopy(A)
         for i in range(1,self.number_of_layers):
             Z = self.linear_forward(A, i)
-            A = self.activation_function[i-1](Z)
-            self.cache_A[i] = A
-            self.cache_Z[i] = Z
-        return A
+            A = deepcopy(self.activation_function[i-1](Z))
+            self.cache_A[i] = deepcopy(A)
+            self.cache_Z[i] = deepcopy(Z)
+        return deepcopy(A)
 
     def linear_forward(self, previous_A, layer_no):
         return np.dot(self.weights[layer_no], previous_A)+self.bias[layer_no]
@@ -56,16 +58,20 @@ class NeuralNetwork:
 
     def cost_function_evaluation(self, X, Y, _lambda = 0):
         output = self.whole_output(X)
-        if self.cost_function == 'cross-entropy':
-            return np.nansum(-np.multiply(Y, np.log(output)) - np.multiply((1 - Y), np.log(1 - output))) / Y.shape[1]
-        elif self.cost_function == 'euclidean_distance':
-            return 1/2 * np.sum(np.power(Y-output,2)) / Y.shape[1]
+        # if self.cost_function == 'cross-entropy':
+        #     return np.nansum(-np.multiply(Y, np.log(output)) - np.multiply((1 - Y), np.log(1 - output))) / Y.shape[1]
+        return np.nansum(-np.multiply(Y, np.log(output)) - np.multiply((1 - Y), np.log(1 - output))) / Y.shape[1]
+        # elif self.cost_function == 'euclidean_distance':
+        #     return 1/2 * np.sum(np.power(Y-output,2)) / Y.shape[1]
 
     def output_layer_cost_derivative(self, output_matrix, Y):
         if self.cost_function == 'cross-entropy':
             return - (np.divide(Y, output_matrix) - np.divide(1 - Y, 1 - output_matrix))
         elif self.cost_function == 'euclidean_distance':
-            return -(Y - output_matrix)
+            # print((output_matrix - Y).shape)
+            return output_matrix - Y
+        else:
+            raise Exception("Wrong cost function name")
 
     def back_propagation(self, X, Y, regularisation_lambda = 0):
         self.cost_derivatives = dict()
@@ -76,8 +82,9 @@ class NeuralNetwork:
             self.weight_derivatives[i] = (np.dot(dZ, self.cache_A[i-1].T) + regularisation_lambda * self.weights[i]) / X.shape[1]
             self.bias_derivatives[i] = np.sum(dZ, axis=1, keepdims=True) / X.shape[1]
             self.cost_derivatives[i - 1] = np.dot(self.weights[i].T, dZ)
-            if i!=1:
-                dZ = self.cost_derivatives[i-1] * self.activation_function[i-1](self.cache_A[i-1], grad=True)
+            if i>1:
+                # dZ = self.cost_derivatives[i-1] * self.activation_function[i-1](self.cache_A[i-1], grad=True)
+                dZ = self.cost_derivatives[i-1] * ReLU(self.cache_A[i-1], grad=True)
 
     def update_weights(self, learning_rate):
         for i in range(1,self.number_of_layers):
@@ -91,7 +98,8 @@ class NeuralNetwork:
                 X = self.min_max_scaler.fit_transform(X)-0.5
             previous_cost_function =  float('inf')
             counter = 0
-            while ((self.cost_function_evaluation(X, Y) / previous_cost_function <= epsilon) and (counter<max_iteration_number)) or (counter<min_iteration_number):
+            # while ((self.cost_function_evaluation(X, Y) / previous_cost_function <= epsilon) and (counter<max_iteration_number)) or (counter<min_iteration_number):
+            while counter<max_iteration_number:
                 previous_cost_function = self.cost_function_evaluation(X,Y)
                 self.whole_output(X)
                 self.back_propagation(X, Y, regularisation_lambda)
@@ -112,7 +120,8 @@ class NeuralNetwork:
 def ReLU(x, grad = False):
     if grad == True:
         return np.int64(x > 0)
-    return x * (x > 0)
+    # return x * (x > 0)
+    return np.maximum(0, x)
 
 
 def sigmoid(x, grad = False):
