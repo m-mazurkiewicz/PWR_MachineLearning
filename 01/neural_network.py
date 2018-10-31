@@ -2,7 +2,6 @@ import numpy as np
 from sklearn import preprocessing
 from matplotlib import pyplot as plt
 import autograd.numpy as np_autograd
-from autograd import jacobian, grad
 from autograd import elementwise_grad as egrad
 from copy import deepcopy
 

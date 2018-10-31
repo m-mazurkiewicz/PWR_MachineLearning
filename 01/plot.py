@@ -63,12 +63,15 @@ def getSamples(N):
 #         Y = np.hstack((Y,Y_extra))
 #     return X,Y
 
-def getSamples_array(N):
+def getSamples_array(N, with_randomisation = True):
     X = np.random.normal(size=(2, N))
     Y = np.zeros((1, N), dtype='int')
     for i in range(N):
         if (X[0, i] > 0) and (X[1, i] < 0):
             Y[0,i] = 1
+    for i in range(N):
+        if np.random.random()<0.03:
+            Y[0,i] = 1-Y[0,i]
     return X,Y
 
 
