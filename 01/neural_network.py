@@ -11,9 +11,6 @@ class NeuralNetwork:
 
     def __init__(self, layers_size_vector, activation_function, cost_function = 'cross-entropy'):
         self.number_of_layers = len(layers_size_vector)
-        # self.activation_function = dict()
-        # for i in range(self.number_of_layers-1):
-        #     self.activation_function[i] = activation_function[i]
         if type(activation_function) is list:
             if self.number_of_layers != len(activation_function) + 1:
                 raise Exception("layer_size_vector & activation_function dimension mismatch")
@@ -61,7 +58,6 @@ class NeuralNetwork:
         output = self.whole_output(X)
         if self.cost_function == 'cross-entropy':
             return np.nansum(-np.multiply(Y, np.log(output)) - np.multiply((1 - Y), np.log(1 - output))) / Y.shape[1]
-        # return np.nansum(-np.multiply(Y, np.log(output)) - np.multiply((1 - Y), np.log(1 - output))) / Y.shape[1]
         elif self.cost_function == 'euclidean_distance':
             return 1/2 * np.sum(np.power(Y-output,2)) / Y.shape[1]
 
@@ -69,7 +65,6 @@ class NeuralNetwork:
         if self.cost_function == 'cross-entropy':
             return - (np.divide(Y, output_matrix) - np.divide(1 - Y, 1 - output_matrix))
         elif self.cost_function == 'euclidean_distance':
-            # print((output_matrix - Y).shape)
             return output_matrix - Y
         else:
             raise Exception("Wrong cost function name")
