@@ -3,7 +3,6 @@ from sklearn import preprocessing
 from matplotlib import pyplot as plt
 import autograd.numpy as np_autograd
 from autograd import elementwise_grad as egrad
-from copy import deepcopy
 
 
 class NeuralNetwork:
@@ -35,13 +34,13 @@ class NeuralNetwork:
     def whole_output(self, A):
         self.cache_A = dict()
         self.cache_Z = dict()
-        self.cache_A[0] = deepcopy(A)
+        self.cache_A[0] = A
         for i in range(1,self.number_of_layers):
             Z = self.linear_forward(A, i)
-            A = deepcopy(self.activation_function[i-1](Z))
-            self.cache_A[i] = deepcopy(A)
-            self.cache_Z[i] = deepcopy(Z)
-        return deepcopy(A)
+            A = self.activation_function[i-1](Z)
+            self.cache_A[i] = A
+            self.cache_Z[i] = Z
+        return A
 
     def linear_forward(self, previous_A, layer_no):
         return np.dot(self.weights[layer_no], previous_A)+self.bias[layer_no]
