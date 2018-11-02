@@ -63,12 +63,15 @@ def getSamples(N):
 #         Y = np.hstack((Y,Y_extra))
 #     return X,Y
 
-def getSamples_array(N):
+def getSamples_array(N, with_randomisation = False, randomisation_parameter = 0.03):
     X = np.random.normal(size=(2, N))
     Y = np.zeros((1, N), dtype='int')
     for i in range(N):
         if (X[0, i] > 0) and (X[1, i] < 0):
-            Y[:,i] = 1
+            Y[0,i] = 1
+        if with_randomisation:
+            if np.random.random()<randomisation_parameter:
+                Y[0, i] = 1 - Y[0, i]
     return X,Y
 
 
@@ -104,7 +107,7 @@ def getGrid(view):
     return [view[0] + (view[1] - view[0]) * i / (view[2] - 1) for i in range(view[2])]
 
 
-numberOfSamples = 1000
+numberOfSamples = 100
 
 viewX = [-4, 4, 101]
 viewY = [-4, 4, 101]
@@ -118,8 +121,9 @@ X,Y = getSamples_array(numberOfSamples)
 # NN = NeuralNetwork(2, [2,2,2], sigmoid, 'euclidean_distance')
 # NN.set_weights([(np.array([[1., 0.01],[0.01, 1.]]), np.array([[0.],[0.]])),(np.array([[1., -1.],[-1., 1.]]),np.array([[0.3],[-0.3]]))])
 # costs = NN.fit(X, Y, 0.001, 1, 0.9999, 10000)
-NN = NeuralNetwork([2, 20, 3, 1], sigmoid, 'cross-entropy')
-costs = NN.fit(X, Y, 0.03, 0, 1, 3000)
+NN = NeuralNetwork([2, 20, 3, 1], [ReLU, ReLU, sigmoid], 'euclidean_distance')
+# NN = NeuralNetwork([2, 20, 3, 1], [ReLU, ReLU, sigmoid], 'cross-entropy')
+costs = NN.fit(X, Y, 0.3, 0, 1, 30000, min_max_normalization=False)
 plt.plot(costs,'o-')
 plt.show()
 # NN = NeuralNetwork(2, [2, 2, 2], sigmoid)
@@ -130,10 +134,12 @@ plt.show()
 # print(Y.shape, NN.predict(X).shape)
 # print(np.array(Y, dtype=bool))
 # predict = (NN.predict(X)-1)*(-1)
-predict = NN.predict(X)
-print(len(np.where(predict & np.array(Y, dtype=bool))[0]))
-print(numberOfSamples-len(np.where(predict | np.array(Y, dtype=bool))[0]))
-# print(confusion_matrix(np.array(Y, dtype=bool),NN.predict(X)))
+# predict = NN.predict(X)
+# print(len(np.where(predict & np.array(Y, dtype=bool))[0]))
+# print(numberOfSamples-len(np.where(predict | np.array(Y, dtype=bool))[0]))
+# print(Y[0,:])
+# print(NN.predict(X)[0,:].tolist()[0])
+print(confusion_matrix(Y[0,:],NN.predict(X)[0,:].tolist()[0]))
 
 # samples = getSamples(numberOfSamples)
 # plotDecisionDomain(getGrid(viewX), getGrid(viewY), getDecisionOfFakeNeuralNet)
