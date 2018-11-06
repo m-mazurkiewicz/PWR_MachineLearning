@@ -9,7 +9,7 @@ class NeuralNetwork:
 
     min_max_scaler = preprocessing.MinMaxScaler()
 
-    def __init__(self, layers_size_vector, activation_function, cost_function = 'cross-entropy'):
+    def __init__(self, layers_size_vector, activation_function, cost_function = 'cross-entropy', dropout_probability=0):
         self.number_of_layers = len(layers_size_vector)
         if type(activation_function) is list:
             if self.number_of_layers != len(activation_function) + 1:
@@ -22,6 +22,7 @@ class NeuralNetwork:
         self.cache = []
         self.fitted = False
         self.cost_function = cost_function
+        self.dropout_probability = dropout_probability
 
     def initialise_parameters(self, layers_size_vector):
         self.weights = dict()
@@ -38,6 +39,8 @@ class NeuralNetwork:
         for i in range(1,self.number_of_layers):
             Z = self.linear_forward(A, i)
             A = self.activation_function[i-1](Z)
+            if self.dropout_probability:
+                A = A * self.dropout_mask[i] / self.dropout_probability
             self.cache_A[i] = A
             self.cache_Z[i] = Z
         return A
@@ -78,6 +81,8 @@ class NeuralNetwork:
             self.weight_derivatives[i] = (np.dot(dZ, self.cache_A[i-1].T) + regularisation_lambda * self.weights[i]) / X.shape[1]
             self.bias_derivatives[i] = np.sum(dZ, axis=1, keepdims=True) / X.shape[1]
             self.cost_derivatives[i - 1] = np.dot(self.weights[i].T, dZ)
+            if self.dropout_probability:
+                self.cost_derivatives[i - 1] = self.cost_derivatives[i - 1] * self.dropout_mask[i - 1] / self.dropout_probability
             if i>1:
                 dZ = self.cost_derivatives[i-1] * self.activation_function[i-2](self.cache_A[i-1], grad=True)
 
@@ -86,7 +91,9 @@ class NeuralNetwork:
             self.weights[i] -= learning_rate * self.weight_derivatives[i]
             self.bias[i] -= learning_rate * self.bias_derivatives[i]
 
-    def fit(self, X, Y, learning_rate, regularisation_lambda, epsilon,max_iteration_number = 10000, min_iteration_number = 4, min_max_normalization = True):
+    def fit(self, X, Y, learning_rate, regularisation_lambda, epsilon,max_iteration_number = 10000, min_iteration_number = 4, min_max_normalization = False):
+        if self.dropout_probability:
+            self.dropout(X.shape[1], self.dropout_probability)
         costs = []
         if not self.fitted:
             if min_max_normalization:
@@ -111,6 +118,10 @@ class NeuralNetwork:
             self.weights[layer_no] = parameters[0]
             self.bias[layer_no] = parameters[1]
 
+    def dropout(self, number_of_examples, probability):
+        self.dropout_mask = dict()
+        for i in range(len(self.layers_size_vector)):
+            self.dropout_mask[i] = np.random.rand(self.layers_size_vector[i], number_of_examples) > probability
 
 def ReLU(x, grad = False):
     if grad == True:
