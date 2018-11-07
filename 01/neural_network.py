@@ -60,7 +60,7 @@ class NeuralNetwork:
         output = self.whole_output(input_matrix)
         if output.shape[0] == 1:
             o = output > 0.5
-            o = o[:, np.newaxis]
+            # o = o[:, np.newaxis]
             return o
         else:
             return np.argmax(output, axis=0)
@@ -169,7 +169,7 @@ def getSamples_array(N):
     for i in range(N):
         if (X[0, i] > 0) and (X[1, i] < 0):
             Y[i] = 1
-    return X, Y
+    return X, Y.T
 
 
 if __name__ == '__main__':
@@ -185,9 +185,12 @@ if __name__ == '__main__':
     # print(NN.cache)
     # NN.back_propagation(, b.T)
     X, Y = getSamples_array(300)
-    NN = NeuralNetwork([2, 20, 3, 1], [ReLU, ReLU, sigmoid], 'euclidean_distance', dropout_probabilities=[.1, .1, .1])
+    print(X.shape, Y.shape)
+    # NN = NeuralNetwork([2, 20, 3, 1], [ReLU, ReLU, sigmoid], 'euclidean_distance', dropout_probabilities=[.4, .2, .1])
+    NN = NeuralNetwork([2, 20, 3, 1], [ReLU, ReLU, sigmoid], 'cross-entropy')
     # NN = NeuralNetwork([2, 20, 3, 1], [ReLU, ReLU, sigmoid], 'euclidean_distance')
-    costs = NN.fit(X, Y.T, 0.3, 0, 0.9995, 30000, min_max_normalization=False)
+    costs = NN.fit(X, Y, 0.01, 0, 100, 10000, min_max_normalization=False)
+    print(NN.predict(X).shape)
     plt.plot(costs, 'o-')
     plt.show()
     # print(NN.whole_output(X))
