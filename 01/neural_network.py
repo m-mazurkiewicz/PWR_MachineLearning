@@ -35,8 +35,7 @@ class NeuralNetwork:
         self.weights = dict()
         self.bias = dict()
         for i in range(1, self.number_of_layers):
-            self.weights[i] = np.random.randn(layers_size_vector[i], layers_size_vector[i - 1]) * np.sqrt(
-                2 / layers_size_vector[i - 1])  # He initialisation
+            self.weights[i] = np.random.randn(layers_size_vector[i], layers_size_vector[i - 1]) * np.sqrt(2 / layers_size_vector[i - 1])  # He initialisation
             # self.weights[i] = np.random.randn(layers_size_vector[i],layers_size_vector[i-1]) / np.sqrt(layers_size_vector[i-1])
             self.bias[i] = np.zeros((layers_size_vector[i], 1))
 
@@ -48,7 +47,8 @@ class NeuralNetwork:
             Z = self.linear_forward(A, i)
             A = self.activation_function[i - 1](Z)
             if bool(self.dropout_probabilities) & dropout:
-                A = A * self.dropout_mask[i] / self.dropout_probabilities[i]
+                if self.dropout_probabilities[i]!=0:
+                    A = A * self.dropout_mask[i] / self.dropout_probabilities[i]
             self.cache_A[i] = A
             self.cache_Z[i] = Z
         return A
@@ -60,7 +60,6 @@ class NeuralNetwork:
         output = self.whole_output(input_matrix)
         if output.shape[0] == 1:
             o = output > 0.5
-            # o = o[:, np.newaxis]
             return o
         else:
             return np.argmax(output, axis=0)
@@ -86,14 +85,13 @@ class NeuralNetwork:
         self.bias_derivatives = dict()
         dZ = self.output_layer_cost_derivative(self.whole_output(X), Y)
         for i in reversed(range(1, self.number_of_layers)):
-            self.weight_derivatives[i] = (np.dot(dZ, self.cache_A[i - 1].T) + regularisation_lambda * self.weights[i]) / \
-                                         X.shape[1]
+            self.weight_derivatives[i] = (np.dot(dZ, self.cache_A[i - 1].T) + regularisation_lambda * self.weights[i]) / X.shape[1]
             self.bias_derivatives[i] = np.sum(dZ, axis=1, keepdims=True) / X.shape[1]
             self.cost_derivatives[i - 1] = np.dot(self.weights[i].T, dZ)
             if i > 1:
                 if self.dropout_probabilities:
-                    self.cost_derivatives[i - 1] = self.cost_derivatives[i - 1] * self.dropout_mask[
-                        i - 1] / self.dropout_probabilities[i - 1]
+                    if self.dropout_probabilities[i-1]:
+                        self.cost_derivatives[i - 1] = self.cost_derivatives[i - 1] * self.dropout_mask[i - 1] / self.dropout_probabilities[i - 1]
                 dZ = self.cost_derivatives[i - 1] * self.activation_function[i - 2](self.cache_A[i - 1], grad=True)
 
     def update_weights(self, learning_rate):
@@ -101,8 +99,7 @@ class NeuralNetwork:
             self.weights[i] -= learning_rate * self.weight_derivatives[i]
             self.bias[i] -= learning_rate * self.bias_derivatives[i]
 
-    def fit(self, X, Y, learning_rate, regularisation_lambda, epsilon, max_iteration_number=10000,
-            min_iteration_number=4, min_max_normalization=False):
+    def fit(self, X, Y, learning_rate, regularisation_lambda, epsilon, max_iteration_number=10000, min_max_normalization=False):
         costs = []
         if not self.fitted:
             if min_max_normalization:
@@ -110,9 +107,8 @@ class NeuralNetwork:
             previous_cost_function = float('inf')
             number_of_training_examples = X.shape[1]
             counter = 0
-            while ((self.cost_function_evaluation(X, Y) / previous_cost_function <= epsilon) and (
-                    counter < max_iteration_number)) or (counter < min_iteration_number):
-                # while counter<max_iteration_number:
+            while ((self.cost_function_evaluation(X, Y) / previous_cost_function <= epsilon) and ( counter < max_iteration_number)):
+            # while counter<max_iteration_number:
                 previous_cost_function = self.cost_function_evaluation(X, Y)
                 if self.dropout_probabilities:
                     self.dropout(number_of_training_examples)
@@ -134,14 +130,14 @@ class NeuralNetwork:
     def dropout(self, number_of_examples):
         self.dropout_mask = dict()
         for i in range(1,self.number_of_layers):
-            self.dropout_mask[i] = np.random.rand(self.layers_size_vector[i], number_of_examples) > self.dropout_probabilities[i]
+            if self.dropout_probabilities[i] != 0:
+                self.dropout_mask[i] = np.random.rand(self.layers_size_vector[i], number_of_examples) > self.dropout_probabilities[i]
 
 
 def ReLU(x, grad=False):
     if grad == True:
         return np.int64(x > 0)
     return x * (x > 0)
-    # return np.maximum(0, x)
 
 
 def sigmoid(x, grad=False):
@@ -173,23 +169,11 @@ def getSamples_array(N):
 
 
 if __name__ == '__main__':
-    # print(NN.single_output((np.ones((9, 1)) * 10)))
-    # print(np.multiply(NN.whole_output(np.ones((9, 3)) * 10),np.ones((2,3))))
-    a = np.array([1, 0, 1])
-    b = np.zeros((3, 2))
-    b[np.arange(3), a] = 1
-    # print(NN.cost_function(np.random.rand(9, 3) * 10, b.T))
-    # print(NN.output_layer_cost_derivative(NN.whole_output(np.random.rand(9, 3) * 10), b.T))
-    # print()
-    # NN.whole_output(np.random.rand(9, 3) * 10)
-    # print(NN.cache)
-    # NN.back_propagation(, b.T)
     X, Y = getSamples_array(300)
-    print(X.shape, Y.shape)
-    # NN = NeuralNetwork([2, 20, 3, 1], [ReLU, ReLU, sigmoid], 'euclidean_distance', dropout_probabilities=[.4, .2, .1])
-    NN = NeuralNetwork([2, 20, 3, 1], [ReLU, ReLU, sigmoid], 'cross-entropy')
+    NN = NeuralNetwork([2, 20, 3, 1], [ReLU, ReLU, sigmoid], 'euclidean_distance', dropout_probabilities=[.4, 0, .1])
+    # NN = NeuralNetwork([2, 20, 3, 1], [ReLU, ReLU, sigmoid], 'cross-entropy')
     # NN = NeuralNetwork([2, 20, 3, 1], [ReLU, ReLU, sigmoid], 'euclidean_distance')
-    costs = NN.fit(X, Y, 0.01, 0, 100, 10000, min_max_normalization=False)
+    costs = NN.fit(X, Y, 0.01, 0, 1, 10000, min_max_normalization=False)
     print(NN.predict(X).shape)
     plt.plot(costs, 'o-')
     plt.show()
