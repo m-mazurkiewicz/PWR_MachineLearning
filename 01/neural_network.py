@@ -117,6 +117,8 @@ class NeuralNetwork:
                 self.update_weights(learning_rate)
                 counter += 1
                 costs.append(self.cost_function_evaluation(X, Y))
+                if counter % 100 == 0:
+                    print("Cost after iteration {}: {}".format(counter, costs[-1]))
             self.fitted = True
             return costs
         else:
