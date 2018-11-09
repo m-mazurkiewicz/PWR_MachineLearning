@@ -135,14 +135,14 @@ class NeuralNetwork:
 
 
 def ReLU(x, grad=False):
-    if grad == True:
+    if grad:
         return np.int64(x > 0)
     return x * (x > 0)
 
 
 def sigmoid(x, grad=False):
     s = 1 / (1 + np.exp(-x))
-    if grad == True:
+    if grad:
         return s * (1 - s)
     return s
 
