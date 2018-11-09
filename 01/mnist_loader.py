@@ -76,3 +76,19 @@ def vectorized_result(j):
     e = np.zeros((10, 1))
     e[j] = 1.0
     return e
+
+
+def load_data_arrays():
+    training_data, validation_data, test_data = load_data_wrapper()
+    training_data_X, training_data_Y = training_data
+    validation_data_X, validation_data_Y = validation_data
+    training_data_X, training_data_Y = training_data
+    training_data_X = np.array(training_data_X)[:, :, 0].T
+    training_data_Y = np.array(training_data_Y)[:, :, 0].T
+    validation_data_X, validation_data_Y = validation_data
+    validation_data_X = np.array(validation_data_X)[:, :, 0].T
+    validation_data_Y = np.array(validation_data_Y)[:, :, 0].T
+    test_data_X, test_data_Y = test_data
+    test_data_X = np.array(test_data_X)[:, :, 0].T
+    test_data_Y = np.array(test_data_Y)[:, :, 0].T
+    return training_data_X, training_data_Y, validation_data_X, validation_data_Y, test_data_X, test_data_Y
