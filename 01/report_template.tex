@@ -20,8 +20,8 @@
 import pickle
 def architecture_table_5(network_architecture):
     print(r"\begin{table}[H]")
-    print(r"\begin{tabular}{c|c|c|c|c|c}")
     print(r"\centering")
+    print(r"\begin{tabular}{c|c|c|c|c|c}")
     table_row = ' '
     for layer in network_architecture.values():
         table_row += ' & ' + layer['activation_function']
