@@ -48,7 +48,7 @@ def architecture_table_5(network_architecture):
     for layer in network_architecture.values():
         table_row += ' & ' + layer['activation_function']
     print(r"{0} \\".format(table_row))
-    table_row = 'layer dimension & \LARGE 748 '
+    table_row = 'layer dimension & \LARGE 784 '
     for layer in network_architecture.values():
         table_row += r"& \LARGE {0}".format(layer['size'])
     print(r"{0} \\".format(table_row))
@@ -67,7 +67,7 @@ def architecture_table_2(network_architecture):
     for layer in network_architecture.values():
         table_row += ' & ' + layer['activation_function']
     print(r"{0} \\".format(table_row))
-    table_row = 'layer dimension & \LARGE 748 '
+    table_row = 'layer dimension & \LARGE 784 '
     for layer in network_architecture.values():
         table_row += r"& \LARGE {0}".format(layer['size'])
     print(r"{0} \\".format(table_row))
@@ -86,7 +86,7 @@ def architecture_table_1(network_architecture):
     for layer in network_architecture.values():
         table_row += ' & ' + layer['activation_function']
     print(r"{0} \\".format(table_row))
-    table_row = 'layer dimension & \LARGE 748 '
+    table_row = 'layer dimension & \LARGE 784 '
     for layer in network_architecture.values():
         table_row += r"& \LARGE {0}".format(layer['size'])
     print(r"{0} \\".format(table_row))
