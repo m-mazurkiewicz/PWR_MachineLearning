@@ -34,6 +34,9 @@
 \begin{document}
 \maketitle
 \begin{pythontexcustomcode}{py}
+import sys
+import os
+sys.path.append(os.getcwd())
 import pickle
 def architecture_table_5(network_architecture):
     print(r"\begin{table}[H]")
