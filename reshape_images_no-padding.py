@@ -1,6 +1,5 @@
 import os
 from PIL import Image
-from resizeimage import resizeimage
 from tqdm import tqdm
 import sys
 
