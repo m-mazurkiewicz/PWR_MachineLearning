@@ -47,5 +47,6 @@ def proceed_class(class_name, reshape_type, resample_method):
         raise ValueError('No such reshape_type - \'{0}\' '.format(reshape_type))
 
 
-for class_name in tqdm(os.listdir(base_dir)):
-    proceed_class(class_name, reshape_type, resample_method)
+if __name__ == '__main__':
+    for class_name in tqdm(os.listdir(base_dir)):
+        proceed_class(class_name, reshape_type, resample_method)
