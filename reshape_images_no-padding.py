@@ -38,12 +38,16 @@ def crop_image(image_path, image_name, resample_method):
 def proceed_class(class_name, reshape_method, resample_method):
     if reshape_method == 'crop':
         os.makedirs((base_dir + class_name + '/').replace('raw/', 'interim/no-padding/crop/'), exist_ok=True)
-        for image in tqdm(os.listdir(base_dir + class_name)):
+        for key,image in enumerate(os.listdir(base_dir + class_name)):
             resize_image(base_dir + class_name + '/', image, resample_methods_dict[resample_method])
+            if key % 100 == 0:
+                print(key)
     elif reshape_method == 'resize':
         os.makedirs((base_dir + class_name + '/').replace('raw/', 'interim/no-padding/resize/'), exist_ok=True)
-        for image in tqdm(os.listdir(base_dir + class_name)):
+        for key,image in enumerate(os.listdir(base_dir + class_name)):
             resize_image(base_dir + class_name + '/', image, resample_methods_dict[resample_method])
+            if key % 100 == 0:
+                print(key)
     else:
         raise ValueError('No such reshape_method - \'{0}\' '.format(reshape_method))
 
