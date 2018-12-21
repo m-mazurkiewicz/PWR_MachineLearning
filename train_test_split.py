@@ -16,7 +16,7 @@ def split(class_name,ratio, target_dir):
     os.makedirs(test_dir, exist_ok=True)
     list = os.listdir(base_dir+set+'/'+class_name)
     number_files = len(list)
-    test_files = np.random.choice(range(number_files), size=int(np.ceil(ratio*number_files)), replace=False, )
+    test_files = np.random.choice(range(number_files), size=int(np.ceil(ratio*number_files)), replace=False)
     for key,image in enumerate(list):
         if key in test_files:
             shutil.copyfile(base_dir+set+'/'+class_name+'/'+image, test_dir+image)
