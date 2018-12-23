@@ -137,4 +137,4 @@ plt.show()
 
 model.save('gdrive/My Drive/alexNetModel1.h5')
 
-model = load_model(test)
+model = load_model('gdrive/My Drive/alexNetModel1.h5')
