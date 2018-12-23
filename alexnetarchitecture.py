@@ -1,4 +1,4 @@
-from keras.models import Sequential
+from keras.models import Sequential, load_model
 from keras.layers.core import Dense, Dropout, Activation, Flatten
 from keras.layers.convolutional import Convolution2D as Conv2D, MaxPooling2D
 from keras.layers.normalization import BatchNormalization
@@ -59,17 +59,19 @@ validation_generator = image_gen.flow_from_directory(
         class_mode='categorical',
         subset='validation')
 
-# image_gen_test = ImageDataGenerator(featurewise_center=True)
-# image_gen_test.fit(x_train)
-# test_generator = image_gen_test.flow_from_directory(
+# image_gen_val = ImageDataGenerator(featurewise_center=True)
+# image_gen_val.fit(x_train)
+# val_generator = image_gen_val.flow_from_directory(
 #     base_dir_processed + data_set + '/' + 'test',
 #         target_size=(227,227),
 #         batch_size=128,
 #         class_mode='categorical')
 
+"""#Model"""
+
 model = Sequential()
 
-model.add(Conv2D(filters=96, input_shape=(227,227,3), kernel_size=(11,11),strides=(4,4), padding='valid'))
+model.add(Conv2D(filters=96, input_shape=(227,227,3), kernel_size=(11,11), strides=(4,4), padding='valid'))
 model.add(Activation('relu'))
 model.add(BatchNormalization())
 model.add(MaxPooling2D(pool_size=(3,3), strides=(2,2), padding='valid'))
@@ -105,8 +107,34 @@ model.add(Activation('softmax'))
 
 model.summary()
 
-model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+model.compile(loss = 'categorical_crossentropy', optimizer = 'adam', metrics=['accuracy'])
 
 hist = model.fit_generator(generator, steps_per_epoch=36, validation_data=validation_generator, validation_steps=4, epochs=100, verbose=1)
 # hist = model.fit_generator(generator, samples_per_epoch=4693, validation_data=validation_generator, validation_steps=4, epochs=100, verbose=1)
+# model.fit_generator(generator, batch_size=64, epochs=50, verbose=1)
 
+"""#Plots"""
+
+# Plot training & validation accuracy values
+plt.plot(hist.history['acc'])
+plt.plot(hist.history['val_acc'])
+plt.title('Model accuracy')
+plt.ylabel('Accuracy')
+plt.xlabel('Epoch')
+plt.legend(['Train', 'Test'], loc='upper left')
+plt.show()
+
+# Plot training & validation loss values
+plt.plot(hist.history['loss'])
+plt.plot(hist.history['val_loss'])
+plt.title('Model loss')
+plt.ylabel('Loss')
+plt.xlabel('Epoch')
+plt.legend(['Train', 'Test'], loc='upper left')
+plt.show()
+
+"""#Model saving/loading"""
+
+model.save('gdrive/My Drive/alexNetModel1.h5')
+
+model = load_model(test)
