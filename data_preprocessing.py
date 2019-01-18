@@ -9,7 +9,6 @@ df['FamilySize'] = df['SibSp'] + df['Parch'] + 1
 df['IsAlone'] = 0
 df.loc[df['FamilySize'] == 1, 'IsAlone'] = 1
 df['Embarked'] = df['Embarked'].fillna('S')
-df['Embarked'] = df['Embarked'].map( {'S': 0, 'C': 1, 'Q': 2} ).astype(int)
 df['Fare'] = df['Fare'].fillna(lambda x: df[df['Pclass'] == x['Pclass']]['Fare'].median())
 age_avg = df['Age'].mean()
 age_std = df['Age'].std()
@@ -18,7 +17,6 @@ age_null_random_list = np.random.randint(age_avg - age_std, age_avg + age_std, s
 # Next line has been improved to avoid warning
 df.loc[np.isnan(df['Age']), 'Age'] = age_null_random_list
 df['Age'] = df['Age'].astype(int)
-df['Sex'] = df['Sex'].map( {'female': 0, 'male': 1} ).astype(int)
 df.drop(["Name", "Ticket", "PassengerId", "Cabin"], axis=1, inplace=True)
 
 train_test_ratio = 0.8
